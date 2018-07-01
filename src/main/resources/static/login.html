@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <!-- 新 Bootstrap 核心 CSS 文件 -->
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- 可选的Bootstrap主题文件（一般不使用） -->
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"></script>
+
+    <!-- jQuery文件。务必在bootstrap.min.js 之前引入 -->
+    <script src="https://cdn.bootcss.com/jquery/2.1.1/jquery.min.js"></script>
+
+    <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<body>
+<form   id="login_form" class="form-horizontal" role="form" action="/authentication/mobile" method="post" enctype="application/x-www-form-urlencoded">
+    <div class="col-sm-offset-5 col-sm-5"  >
+        <h2>welcome</h2>
+    </div>
+    <div class="form-group">
+        <div class="col-sm-10">
+
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="mobile" class="col-sm-2 control-label">手机号：</label>
+        <div class="col-sm-4">
+            <input type="text" class="form-control" id="mobile" name="mobile">
+        </div>
+        <input type="button" class="btn btn-info" id="verify_sms" onclick="getSms(this)" value="获取验证码">
+    </div>
+
+
+    <div class="form-group">
+        <label for="smsCode" class="col-sm-2 control-label">验证码：</label>
+        <div class="col-sm-4">
+            <input id="smsCode"  type="text" name="smsCode" class="form-control ">
+        </div>
+
+    </div>
+
+    <br>
+    <div class="form-group space">　
+        <div class="col-sm-offset-2 col-sm-10">
+            <button type="submit" id="login" class="btn btn-primary" >登录</button>
+            <!--<button type="button" id="register" class="btn btn-default " onclick="window.open('register.html')">注册</button>-->
+            <button type="button" id="register" class="btn btn-default " onclick="javascript:window.location.href='http://localhost:8080/register.html'">注册</button>
+        </div>
+    </div>
+</form>
+</body>
+<script type="text/javascript">
+
+
+    var wait = 60; // 短信验证码60秒后才可获取下一个
+    function getSms(that) {
+        var phone = $('#mobile').val();
+        setButtonStatus(that); // 设置按钮倒计时
+        var obj = {
+            mobile: phone
+        };
+        $.ajax({
+            url: "/code/sms",
+            type: "get",
+            data: obj,
+            dataType: 'json',
+            success: function (res) {
+                console.log(res);
+            },
+            error: function () {
+                alert("failed");
+            }
+        });
+    }
+
+    /**
+     * 设置按钮状态
+     */
+    function setButtonStatus(that) {
+        if (wait == 0) {
+            that.removeAttribute("disabled");
+            that.value="获取验证码";
+            wait = 60;
+        } else {
+            that.setAttribute("disabled", true);
+            that.value=wait+"秒后可以重新发送";
+            wait--;
+            setTimeout(function() {
+                setButtonStatus(that)
+            }, 1000)
+        }
+    }
+</script>
+</html>
