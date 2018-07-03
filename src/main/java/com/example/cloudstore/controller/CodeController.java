@@ -66,7 +66,7 @@ public class CodeController {
         session.setAttribute(SESSION_KEY_SMS,smsCode1);
 //        smsService.sendMessage(mobile,smsCode1.getCode());
         System.out.println("手机验证码是："+smsCode1.getCode());
-        String res ="{\"code\":200,\"message\":\"发送成功\"}";
+        String res ="{\"code\":0,\"msg\":\"发送成功\"}";
         return res;
     }
 
@@ -76,7 +76,7 @@ public class CodeController {
      * @Description: 验证验证码是否正确
      */
     @GetMapping("/code/sms/verify")
-    public Result checkSmsCode(HttpServletRequest request, @RequestParam("sms")String sms){
+    public Result checkSmsCode(HttpServletRequest request, String sms){
         HttpSession session = request.getSession();
         SmsCode smsCode = (SmsCode)session.getAttribute(SESSION_KEY_SMS);
         if (smsCode.getCode().equals(sms)){

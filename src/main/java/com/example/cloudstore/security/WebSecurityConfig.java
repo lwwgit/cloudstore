@@ -80,12 +80,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
                 .authorizeRequests()
                 .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
                 // 如果有允许匿名的url，填在下面
-                .antMatchers("/code/**","/change/**","/register*","/swagger-ui.html","/login.html").permitAll()
+                .antMatchers("/code/**","/forget/password","/user/check","/register/**","/swagger-ui.html","/login.html").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 // 设置登陆页
                 .formLogin()//表单登录 .httpBasic是另一种登录方式
-              //      .loginPage("/loginPage")
+                    .loginPage("/loginPage")
                     .loginProcessingUrl("/authentication/login")//form表单提交的路径，默认是'/login'
 //                    .successForwardUrl("/login/success")
 //                    .failureUrl("/login/error")

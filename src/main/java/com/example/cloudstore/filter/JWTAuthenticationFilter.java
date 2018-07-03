@@ -34,7 +34,7 @@ public class JWTAuthenticationFilter extends BasicAuthenticationFilter {
             return;
         }
 
-        System.out.println("111111111111111111");
+        System.out.println("我是JWT过滤器");
         UsernamePasswordAuthenticationToken authentication = getAuthentication(request);
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -43,7 +43,7 @@ public class JWTAuthenticationFilter extends BasicAuthenticationFilter {
     }
 
     private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest request) {
-        String token = request.getHeader("Token");
+        String token = request.getHeader("Authorization");
         if (token != null) {
             // parse the token.
             String user = Jwts.parser()

@@ -66,4 +66,13 @@ public class SysUser {
     }
 
 
+    @Override
+    public String toString() {
+        return "SysUser{" +
+                "id=" + id +
+                ", tel='" + tel + '\'' +
+                ", username='" + username + '\'' +
+                ", createDate=" + createDate +
+                '}';
+    }
 }

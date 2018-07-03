@@ -1,5 +1,7 @@
 package com.example.cloudstore.authentication;
 
+import com.example.cloudstore.domain.entity.SysUser;
+import com.example.cloudstore.service.SysUserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -25,6 +27,8 @@ public class MyAuthenticationSuccessHandler implements AuthenticationSuccessHand
 
     @Autowired
     private ObjectMapper objectMapper;
+    @Autowired
+    private SysUserService sysUserService;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -38,11 +42,13 @@ public class MyAuthenticationSuccessHandler implements AuthenticationSuccessHand
                 .signWith(SignatureAlgorithm.HS512, "MyJwtSecret")
                 .compact();
 //        response.addHeader("Authentication", token);
-        String usename = ((User) authentication.getPrincipal()).getUsername();
+        String username = ((User) authentication.getPrincipal()).getUsername();
+        SysUser sysUser = sysUserService.selectByName(username);
+        String tel = sysUser.getTel();
         Collection<GrantedAuthority> role = ((User) authentication.getPrincipal()).getAuthorities();
         response.setCharacterEncoding("UTF-8");
         response.setContentType("application/json");
-        response.getWriter().println("{\"code\":0,\"msg\":\"登录成功\",\"Token\":\""+ token + "\",\"username\":\""+ usename + "\",\"role\":\""+ role + "\"}");
+        response.getWriter().println("{\"code\":0,\"msg\":\"登录成功\",\"Token\":\""+ token + "\",\"username\":\""+ username + "\",\"role\":\""+ role + "\",\"tel\":\""+ tel + "\"}");
     }
 
 

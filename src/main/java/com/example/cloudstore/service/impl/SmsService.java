@@ -1,5 +1,6 @@
 package com.example.cloudstore.service.impl;
 
+import com.example.cloudstore.controller.CodeController;
 import com.example.cloudstore.validate.SmsCode;
 import com.github.qcloudsms.SmsSingleSender;
 import com.github.qcloudsms.SmsSingleSenderResult;
@@ -53,7 +54,9 @@ public class SmsService {
      */
     public boolean checkSmsCode(HttpServletRequest request, String sms){
         HttpSession session = request.getSession();
-        SmsCode smsCode = (SmsCode)session.getAttribute("SESSION_KEY_SMS_CODE");
+        SmsCode smsCode = (SmsCode)session.getAttribute(CodeController.SESSION_KEY_SMS);
+//        System.out.println("11111111" + smsCode.getCode());
+//        System.out.println("22222" + sms);
         if (smsCode.getCode().equals(sms)){
             return true;
         }

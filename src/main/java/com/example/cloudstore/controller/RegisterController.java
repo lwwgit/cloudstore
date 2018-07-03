@@ -8,10 +8,7 @@ import com.example.cloudstore.service.impl.SmsService;
 import com.example.cloudstore.utils.ResultUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
@@ -21,7 +18,7 @@ import java.util.Date;
  * @Date Create in 13:59 2018/6/29
  * @Description: 用户注册
  */
-@CrossOrigin
+
 @RestController
 public class RegisterController {
 
@@ -40,32 +37,49 @@ public class RegisterController {
 
     @Autowired
     private UserStoreService userStoreService;
+
+
     /**
      * @Author: jitdc
      * @Date: 14:12 2018/6/29
      * @Description: 判断用户名和手机号是否已存在
      */
 
+    @RequestMapping(value = "/loginPage")
+    public Result loginPage(){
+        return ResultUtil.error(100, "请先登录");
+    }
+
+    @GetMapping("/user/check")
+    public Result checkUser(String username,String tel){
+        if (userService.selectByName(username) != null) {
+            return ResultUtil.error(1, "用户名已存在");
+        }
+        if (userService.selectByTel(tel) != null) {
+            return ResultUtil.error(1, "手机号已被占用");
+        }
+        return ResultUtil.success();
+    }
+
     @PostMapping("/register")
-    public Result register(@RequestParam("username") String username,
-                           @RequestParam("password") String password,
-                           @RequestParam("tel")String tel,
-                           @RequestParam("sms") String sms,
-                           HttpServletRequest request){
+    public Result register(HttpServletRequest request,
+                           SysUser sysUser,
+                           String sms){
+        System.out.println("44444444" + sms);
 
         boolean result = smsService.checkSmsCode(request,sms);
         if (result == true) {
-            if (userService.selectByName(username) != null) {
+            if (userService.selectByName(sysUser.getUsername()) != null) {
                 return ResultUtil.error(1, "用户名已存在");
             }
-            if (userService.selectByTel(tel) != null) {
+            if (userService.selectByTel(sysUser.getTel()) != null) {
                 return ResultUtil.error(1, "手机号已被占用");
             }
             SysUser user = new SysUser();
-            user.setUsername(username);
+            user.setUsername(sysUser.getUsername());
             user.setCreateDate(new Date());
-            user.setPassword(passwordEncoder.encode(password));
-            user.setTel(tel);
+            user.setPassword(passwordEncoder.encode(sysUser.getPassword()));
+            user.setTel(sysUser.getTel());
             userService.insert(user);
 
             SysRole sysRole = sysRoleService.findByRole("ROLE_USER");
@@ -83,6 +97,8 @@ public class RegisterController {
             userStore.setDir(user.getUsername());
             userStore.setAvailableCapacity("2GB");
             userStoreService.insert(userStore);
+
+            //在hadoop上创建属于用户的根文件夹并在根文件夹中创建回收站目录
 
             return ResultUtil.success();
         }else {
