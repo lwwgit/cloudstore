@@ -6,6 +6,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -14,8 +15,10 @@ import java.net.URI;
 @Service
 public class IconServiceImpl implements IconService {
 
-    private String HADOOP_URL = "hdfs://192.168.59.145:9000";
+//    private String HADOOP_URL = "hdfs://192.168.59.145:9000";
 
+    @Value("${HDFS_PATH}")
+    private String HADOOP_URL;
     /**
      * 用户注册时在文件系统创建和用户名相同的文件夹(/user)
      * 在属于用户的文件夹下创建回收站目录（/user/tmp）
