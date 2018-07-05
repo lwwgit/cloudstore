@@ -11,6 +11,8 @@ import java.util.Map;
 public interface SortService {
     List<Map<String, Object>> SortFile(int flag) throws URISyntaxException, IOException;
 
-    void ShowFile(FileSystem hdfs, Path path, List<Map<String, Object>> ListMap, int flag) throws IOException;
+    void ShowFile(FileSystem hdfs, Path path, List<Map<String, Object>> ListMap, int flag,
+                  String[] doc, String[] pict, String[] video,
+                  String[] music, String[] other) throws IOException;
 
 }
