@@ -11,6 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.util.Date;
 
 /**
@@ -38,6 +39,9 @@ public class RegisterController {
     @Autowired
     private UserStoreService userStoreService;
 
+    @Autowired
+    private IconService iconService;
+
 
     /**
      * @Author: jitdc
@@ -64,7 +68,7 @@ public class RegisterController {
     @PostMapping("/register")
     public Result register(HttpServletRequest request,
                            SysUser sysUser,
-                           String sms){
+                           String sms) throws IOException {
         System.out.println("44444444" + sms);
 
         boolean result = smsService.checkSmsCode(request,sms);
@@ -98,9 +102,19 @@ public class RegisterController {
             userStore.setAvailableCapacity("2GB");
             userStoreService.insert(userStore);
 
-            //在hadoop上创建属于用户的根文件夹并在根文件夹中创建回收站目录
+            //在hadoop上创建属于用户的根文件夹并在创建回收站目录
+            String username = user.getUsername();
+            String userDirPath = "/" + username;
+            boolean result1 =  iconService.createDir(userDirPath);
+            if(result1 == true){
+                String userTmpPath = userDirPath + "tmp";
+                boolean result2 =  iconService.createDir(userTmpPath);
+                if(result2 == true){
+                    return ResultUtil.success();
+                }
+            }
+            return ResultUtil.error(2,"失败");
 
-            return ResultUtil.success();
         }else {
             // 验证码超时或输入错误
             return ResultUtil.error(1, "验证码错误");
