@@ -422,3 +422,197 @@ Body
 }
 
 ```
+
+##文件分类和查找
+
+###文件分类
+```
+POST /sort
+```
+####Request(flag=1)
+Headers
+```
+Content-Type:application/x-www-form-urlencoded
+```
+Body
+```
+{
+    "flag": 1
+ }
+```
+
+####Response 200
+Headers
+```
+Content-Type:application/x-www-form-urlencoded
+```
+Body
+```
+{
+    "Path": "hdfs://maste:9000/dir1/Troye Sivan - WILD.mp3",
+    "length": 8830245,
+    "ModificationTime": "2018-07-04 09:57",
+    "type": "mp3",
+    "Name": "Troye Sivan - WILD.mp3"
+  },
+  {
+    "Path": "hdfs://maste:9000/dir3/shw/BTS - DNA.flac",
+    "length": 29212161,
+    "ModificationTime": "2018-07-04 09:56",
+    "type": "flac",
+    "Name": "BTS - DNA.flac"
+  }
+```
+####Request(flag=2)
+Headers
+```
+Content-Type:application/x-www-form-urlencoded
+```
+Body
+```
+{
+    "flag": 2
+ }
+```
+
+####Response 200
+Headers
+```
+Content-Type:application/x-www-form-urlencoded
+```
+Body
+```
+{
+    "Path": "hdfs://maste:9000/dir1/龙母.jpg",
+    "length": 25798,
+    "ModificationTime": "2018-07-04 09:35",
+    "type": "jpg",
+    "Name": "龙母.jpg"
+  },
+  {
+    "Path": "hdfs://maste:9000/dir3/shw/pjpj.jpg",
+    "length": 25424,
+    "ModificationTime": "2018-06-28 16:15",
+    "type": "jpg",
+    "Name": "pjpj.jpg"
+  }
+```
+####Request(flag=3)
+Headers
+```
+Content-Type:application/x-www-form-urlencoded
+```
+Body
+```
+{
+    "flag": 3
+ }
+```
+
+####Response 200
+Headers
+```
+Content-Type:application/x-www-form-urlencoded
+```
+Body
+```
+[]
+```
+####Request(flag=4)
+Headers
+```
+Content-Type:application/x-www-form-urlencoded
+```
+Body
+```
+{
+    "flag": 4
+ }
+```
+
+####Response 200
+Headers
+```
+Content-Type:application/x-www-form-urlencoded
+```
+Body
+```
+  {
+    "Path": "hdfs://maste:9000/dir1/Troye Sivan - WILD.mp3",
+    "length": 8830245,
+    "ModificationTime": "2018-07-04 09:57",
+    "type": "mp3",
+    "Name": "Troye Sivan - WILD.mp3"
+  },
+  {
+    "Path": "hdfs://maste:9000/dir3/shw/BTS - DNA.flac",
+    "length": 29212161,
+    "ModificationTime": "2018-07-04 09:56",
+    "type": "flac",
+    "Name": "BTS - DNA.flac"
+  }
+```
+####Request(flag=5)
+Headers
+```
+Content-Type:application/x-www-form-urlencoded
+```
+Body
+```
+ {
+    "flag": 5
+ }
+```
+
+####Response 200
+Headers
+```
+Content-Type:application/x-www-form-urlencoded
+```
+Body
+```
+{
+    "Path": "hdfs://maste:9000/dir3/Git-2.18.0-64-bit.exe",
+    "length": 41126928,
+    "ModificationTime": "2018-07-04 09:58",
+    "type": "exe",
+    "Name": "Git-2.18.0-64-bit.exe"
+ }
+```
+###文件查找
+```
+POST /SearchFile
+```
+####Request
+Headers
+```
+Content-Type:application/x-www-form-urlencoded
+```
+Body
+```
+{
+    "SearchWord": 软件
+ }
+```
+####Response 200
+Headers
+```
+Content-Type:application/x-www-form-urlencoded
+```
+Body
+```
+{
+    "Path": "hdfs://maste:9000/dir3/shw/软件开发需求文档模板.pdf",
+    "length": 401185,
+    "ModificationTime": "2018-07-04 09:37",
+    "type": "pdf",
+    "Name": "软件开发需求文档模板.pdf"
+  },
+  {
+    "Path": "hdfs://maste:9000/dir3/shw/软件详细设计文档模板.doc",
+    "length": 275969,
+    "ModificationTime": "2018-07-04 09:35",
+    "type": "doc",
+    "Name": "软件详细设计文档模板.doc"
+  }
+```
