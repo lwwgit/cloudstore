@@ -4,6 +4,9 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,6 +18,12 @@ import java.net.URISyntaxException;
 
 @Component
 public class GlobalFunction {
+
+    private Logger logger = LoggerFactory.getLogger(getClass());
+    @Value("${HDFS_PATH}")
+    private String HADOOP_URL;
+
+
     /**
      * 获取当前登录用户的用户名
      *
@@ -56,5 +65,24 @@ public class GlobalFunction {
         return "Error.Input is error";
     }
 
+
+    /**
+     * 根据配置文件获取HDFS操作对象
+     * @return
+     * @throws IOException
+     */
+    public FileSystem getHadoopFileSystem() throws IOException {
+        //读取配置文件
+        Configuration conf = new Configuration();
+        FileSystem fs = null;
+        try {
+            // 根据配置文件创建HDFS对象
+            fs = FileSystem.get(URI.create(HADOOP_URL),conf);
+        } catch (IOException e) {
+            e.printStackTrace();
+            logger.error("",e);
+        }
+        return fs;
+    }
 
 }
