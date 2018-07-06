@@ -444,7 +444,7 @@ Body
 ####Response 200
 Headers
 ```
-Content-Type:application/x-www-form-urlencoded
+Content-Type: text/plain;charset=UTF-8
 ```
 Body
 ```
@@ -534,7 +534,7 @@ Body
 ####Response 200
 Headers
 ```
-Content-Type:application/x-www-form-urlencoded
+Content-Type: text/plain;charset=UTF-8
 ```
 Body
 ```
@@ -568,7 +568,7 @@ Body
 ####Response 200
 Headers
 ```
-Content-Type:application/x-www-form-urlencoded
+Content-Type: text/plain;charset=UTF-8
 ```
 Body
 ```
@@ -589,7 +589,7 @@ Body
 ####Response 200
 Headers
 ```
-Content-Type:application/x-www-form-urlencoded
+Content-Type: text/plain;charset=UTF-8
 ```
 Body
 ```
@@ -623,7 +623,7 @@ Body
 ####Response 200
 Headers
 ```
-Content-Type:application/x-www-form-urlencoded
+Content-Type: text/plain;charset=UTF-8
 ```
 Body
 ```
@@ -653,7 +653,7 @@ Body
 ####Response 200
 Headers
 ```
-Content-Type:application/x-www-form-urlencoded
+Content-Type: text/plain;charset=UTF-8
 ```
 Body
 ```
@@ -671,4 +671,59 @@ Body
     "type": "doc",
     "Name": "软件详细设计文档模板.doc"
   }
+```
+##文件分享
+###生成分享链接
+```
+POST /GetSharedLink
+```
+####Request
+Headers
+```
+Content-Type: application/x-www-form-urlencoded
+```
+Body
+```
+{
+    "FilePath": hdfs://maste:9000/dir3/shw/test/test.txt
+}
+```
+####Response
+Headers
+```
+Content-Type: text/plain;charset=UTF-8
+```
+Body
+```
+http://localhost:8080/share.html?id=QDD8qup7
+```
+
+###查看分享文件
+```
+POST /share.html
+```
+####Request
+Header
+```
+Content-Type: application/x-www-form-urlencoded
+```
+Body
+```
+http://localhost:8080/share.html?id=QDD8qup7
+```
+####Response 200
+Header
+```
+Content-Type: text/plain;charset=UTF-8
+```
+Body
+```
+{
+  "id": "QDD8qup7",
+  "filename": "test.txt",
+  "owner": "shw",
+  "size": 0,
+  "type": "txt",
+  "path": "hdfs://maste:9000/dir3/shw/test/test.txt"
+}
 ```
