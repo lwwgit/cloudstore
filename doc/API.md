@@ -429,7 +429,7 @@ Body
 ```
 POST /sort
 ```
-####Request(flag=1)
+####Request (获取文档类型的文件)
 Headers
 ```
 Content-Type:application/x-www-form-urlencoded
@@ -449,21 +449,77 @@ Content-Type:application/x-www-form-urlencoded
 Body
 ```
 {
-    "Path": "hdfs://maste:9000/dir1/Troye Sivan - WILD.mp3",
-    "length": 8830245,
-    "ModificationTime": "2018-07-04 09:57",
-    "type": "mp3",
-    "Name": "Troye Sivan - WILD.mp3"
+    "Path": "hdfs://maste:9000/dir1/test1.docx",
+    "length": 0,
+    "ModificationTime": "2018-07-03 10:27",
+    "type": "docx",
+    "Name": "test1.docx"
   },
   {
-    "Path": "hdfs://maste:9000/dir3/shw/BTS - DNA.flac",
-    "length": 29212161,
-    "ModificationTime": "2018-07-04 09:56",
-    "type": "flac",
-    "Name": "BTS - DNA.flac"
+    "Path": "hdfs://maste:9000/dir1/test1.pptx",
+    "length": 0,
+    "ModificationTime": "2018-07-03 10:26",
+    "type": "pptx",
+    "Name": "test1.pptx"
+  },
+  {
+    "Path": "hdfs://maste:9000/dir2/test1.xlsx",
+    "length": 6610,
+    "ModificationTime": "2018-07-03 10:28",
+    "type": "xlsx",
+    "Name": "test1.xlsx"
+  },
+  {
+    "Path": "hdfs://maste:9000/dir2/test3.pptx",
+    "length": 0,
+    "ModificationTime": "2018-07-03 10:28",
+    "type": "pptx",
+    "Name": "test3.pptx"
+  },
+  {
+    "Path": "hdfs://maste:9000/dir3/详细报表.txt",
+    "length": 10035,
+    "ModificationTime": "2018-07-04 09:37",
+    "type": "txt",
+    "Name": "详细报表.txt"
+  },
+  {
+    "Path": "hdfs://maste:9000/dir3/shw/软件开发需求文档模板.pdf",
+    "length": 401185,
+    "ModificationTime": "2018-07-04 09:37",
+    "type": "pdf",
+    "Name": "软件开发需求文档模板.pdf"
+  },
+  {
+    "Path": "hdfs://maste:9000/dir3/shw/软件详细设计文档模板.doc",
+    "length": 275969,
+    "ModificationTime": "2018-07-04 09:35",
+    "type": "doc",
+    "Name": "软件详细设计文档模板.doc"
+  },
+  {
+    "Path": "hdfs://maste:9000/dir3/shw/test/test.txt",
+    "length": 0,
+    "ModificationTime": "2018-06-29 11:14",
+    "type": "txt",
+    "Name": "test.txt"
+  },
+  {
+    "Path": "hdfs://maste:9000/dir3/test2.docx",
+    "length": 0,
+    "ModificationTime": "2018-07-03 10:29",
+    "type": "docx",
+    "Name": "test2.docx"
+  },
+  {
+    "Path": "hdfs://maste:9000/dir3/test2.pptx",
+    "length": 0,
+    "ModificationTime": "2018-07-03 10:29",
+    "type": "pptx",
+    "Name": "test2.pptx"
   }
 ```
-####Request(flag=2)
+####Request (获取图片类型的文件)
 Headers
 ```
 Content-Type:application/x-www-form-urlencoded
@@ -497,7 +553,7 @@ Body
     "Name": "pjpj.jpg"
   }
 ```
-####Request(flag=3)
+####Request (获取视频类型的文件)
 Headers
 ```
 Content-Type:application/x-www-form-urlencoded
@@ -518,7 +574,7 @@ Body
 ```
 []
 ```
-####Request(flag=4)
+####Request (获取音乐类型的文件 )
 Headers
 ```
 Content-Type:application/x-www-form-urlencoded
@@ -552,7 +608,7 @@ Body
     "Name": "BTS - DNA.flac"
   }
 ```
-####Request(flag=5)
+####Request (获取其他类型的文件)
 Headers
 ```
 Content-Type:application/x-www-form-urlencoded
