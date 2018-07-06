@@ -7,7 +7,6 @@ import com.example.cloudstore.service.IconService;
 import com.example.cloudstore.service.SysUserService;
 import com.example.cloudstore.service.UserInfoService;
 import com.example.cloudstore.utils.ResultUtil;
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -17,11 +16,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.URI;
+import java.io.*;
 
 @RestController
 public class UserInfoController {
@@ -38,7 +36,6 @@ public class UserInfoController {
     @Autowired
     private IconService iconService;
 
-    private String HADOOP_URL = "hdfs://192.168.59.145:9000";
 
     /**
      * 忘记密码
@@ -103,37 +100,66 @@ public class UserInfoController {
     }
 
     /**
-     * 上传（修改）头像
-     * @param src 头像的路径如“C:\Users\liweiwei\Pictures\psb.png”
+     * 上传（修改）头像 content-type :form-data
      * @return
      * @throws IOException
      */
-    @PostMapping("/user/upload/icon")
-    public Result uploadImageFile(String src) throws IOException {
+    @PostMapping("/user/icon/upload")
+    public Result uploadImageFile(MultipartFile file) throws IOException {
         String username = globalFunction.getUsername();
         String dst = "/userIcon/" + username + ".jpg";
-        String IconPath = iconService.uploadImageFile(src,dst);
-        //插入数据库
-        UserInfo userInfo = userInfoService.findByUsername(username);
-        userInfo.setIcon(IconPath);
-        userInfoService.insert(userInfo);
-        return ResultUtil.success(IconPath);
+        if (!file.isEmpty()) {
+            try {
+                String src = file.getOriginalFilename();
+
+                BufferedOutputStream out = new BufferedOutputStream(
+                        new FileOutputStream(
+                                new File(src)
+                        )
+                );
+
+                out.write(file.getBytes());
+
+                out.flush();
+                out.close();
+
+
+                String IconPath = iconService.uploadImageFile(src,dst);
+                //插入数据库
+                UserInfo userInfo = userInfoService.findByUsername(username);
+                userInfo.setIcon(IconPath);
+                userInfoService.insert(userInfo);
+
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                return ResultUtil.error(1,"上传失败, " + e.getMessage());
+            } catch (IOException e) {
+                e.printStackTrace();
+                return ResultUtil.error(1,"上传失败, " + e.getMessage());
+            }
+
+
+            return ResultUtil.success();
+
+        } else {
+            return ResultUtil.error(1,"上传失败,文件为空");
+        }
+
     }
 
     /**
      * 获取头像
      */
-    @GetMapping("/usr/icon")
+    @GetMapping("/usr/icon/get")
     public void readFileByAPI(HttpServletResponse response) throws IOException {
 //        String iconPath = "hdfs://192.168.59.145:9000/userIcon/lww.jpg";
         String username = globalFunction.getUsername();
         UserInfo userInfo = userInfoService.findByUsername(username);
         String iconPath = userInfo.getIcon();
 
-        //读取配置文件
-        Configuration conf = new Configuration();
+
         //获取文件系统
-        FileSystem fs = FileSystem.get(URI.create(HADOOP_URL),conf);
+        FileSystem fs = globalFunction.getHadoopFileSystem();
 
         //获取路径
         Path p = new Path(iconPath);
@@ -153,7 +179,5 @@ public class UserInfoController {
         //关闭输出流
         baos.close();
     }
-
-
 
 }
