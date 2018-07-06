@@ -19,7 +19,9 @@ public class SortController {
     private SearchService searchService;
 
     @PostMapping("/sort")
-    public List<Map<String, Object>> SortFile(int flag) throws IOException, URISyntaxException {
+//    @RequestMapping(value = "/sort", method = RequestMethod.GET)
+    public List<Map<String, Object>> SortFile(Integer flag) throws IOException, URISyntaxException {
+
         List<Map<String,Object>> list = sortService.SortFile(flag);
         return list;
 
