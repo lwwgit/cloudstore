@@ -27,7 +27,7 @@ public class SortServiceImpl implements SortService {
     public List<Map<String, Object>> SortFile(int flag) throws URISyntaxException, IOException {
 
         /**************  确定用户文件夹  *******************/
-        //        GlobalFunction globalFunction = new GlobalFunction();
+//        GlobalFunction globalFunction = new GlobalFunction();
 //        String name = globalFunction.getUsername();
 //        String name = null;
         /*************************************************/
