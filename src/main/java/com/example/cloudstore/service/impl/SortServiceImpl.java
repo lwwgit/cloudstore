@@ -32,7 +32,6 @@ public class SortServiceImpl implements SortService {
         /**************  确定用户文件夹  *******************/
         GlobalFunction globalFunction = new GlobalFunction();
         String name = globalFunction.getUsername();
-//        String name = null;
         /*************************************************/
         FileSystem hdfs = null;
         Configuration config = new Configuration();
@@ -53,7 +52,6 @@ public class SortServiceImpl implements SortService {
                 "wav", "mp3", "wma", "aac", "flac"};
 
         ShowFile(hdfs, path, ListMap, flag, doc, pict, video, music, other);
-//        System.out.println("############" + ListMap);
         return ListMap;
     }
 
