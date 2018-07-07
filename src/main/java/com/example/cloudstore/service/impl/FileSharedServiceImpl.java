@@ -37,7 +37,7 @@ public class FileSharedServiceImpl implements FileSharedService {
         }
         String ReturnUrl = "http://localhost:8080/share.html?id=" + sb.toString();
 
-//        String HdfsPath = "hdfs://maste:9000";
+
         FileSystem hdfs = null;
         Configuration config = new Configuration();
         config.set("fs.default.name", HdfsPath);
