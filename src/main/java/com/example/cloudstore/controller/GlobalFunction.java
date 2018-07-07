@@ -45,12 +45,12 @@ public class GlobalFunction {
         FileSystem hdfs = null;
         Configuration config = new Configuration();
         // 程序配置
-        config.set("fs.default.name", "hdfs://maste:9000");
+        config.set("fs.default.name", HADOOP_URL);
         //config.set("hadoop.job.ugi", "feng,111111");
         //config.set("hadoop.tmp.dir", "/tmp/hadoop-fengClient");
         //config.set("dfs.replication", "1");
         //config.set("mapred.job.tracker", "master:9001");
-        hdfs = FileSystem.get(new URI("hdfs://maste:9000"), config);
+        hdfs = FileSystem.get(new URI(HADOOP_URL), config);
 //        Path path = new Path("/");
         Path newPath = new Path(path);
         FileStatus fileStatus = hdfs.getFileStatus(newPath);

@@ -6,6 +6,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -20,15 +21,17 @@ import java.util.Map;
 @Service
 public class SortServiceImpl implements SortService {
 
+    @Value("${HDFS_PATH}")
+    private String HdfsPath;
     //更改文件服务器地址
-    static String HdfsPath = "hdfs://maste:9000";
+//    static String HdfsPath = "hdfs://maste:9000";
 
     @Override
     public List<Map<String, Object>> SortFile(int flag) throws URISyntaxException, IOException {
 
         /**************  确定用户文件夹  *******************/
-//        GlobalFunction globalFunction = new GlobalFunction();
-//        String name = globalFunction.getUsername();
+        GlobalFunction globalFunction = new GlobalFunction();
+        String name = globalFunction.getUsername();
 //        String name = null;
         /*************************************************/
         FileSystem hdfs = null;
@@ -36,7 +39,7 @@ public class SortServiceImpl implements SortService {
 
         config.set("fs.default.name", HdfsPath);
         hdfs = FileSystem.get(new URI(HdfsPath), config);
-        Path path = new Path("/");/**********确定用户文件夹  new Path("/" + name)***********/
+        Path path = new Path("/" + name);/**********确定用户文件夹  new Path("/" + name)***********/
         List<Map<String, Object>> ListMap = new ArrayList<>();
 
         String[] doc = new String[]{"docx", "doc", "xlsx", "xls", "pptx", "ppt", "txt", "pdf"};

@@ -6,6 +6,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -22,14 +23,16 @@ import java.util.regex.Pattern;
 @Service
 public class SearchServiceImpl implements SearchService {
 
+    @Value("${HDFS_PATH}")
+    private String HdfsPath;
     //更改文件服务器地址
-    static String HdfsPath = "hdfs://maste:9000";
+//    static String HdfsPath = "hdfs://maste:9000";
 
     @Override
     public List<Map<String, Object>> SearchFile(String SearchWord) throws URISyntaxException, IOException {
-//        GlobalFunction globalFunction = new GlobalFunction();
-//        String name = globalFunction.getUsername();
-        String name = "";
+        GlobalFunction globalFunction = new GlobalFunction();
+        String name = globalFunction.getUsername();
+//        String name = "";
 
 
         FileSystem hdfs = null;

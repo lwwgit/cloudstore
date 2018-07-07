@@ -8,6 +8,7 @@ import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -17,6 +18,10 @@ import java.util.Optional;
 
 @Service
 public class FileSharedServiceImpl implements FileSharedService {
+
+
+    @Value("${HDFS_PATH}")
+    private String HdfsPath;
 
     @Autowired
     FileSharedRepository fileSharedRepository;
@@ -32,7 +37,7 @@ public class FileSharedServiceImpl implements FileSharedService {
         }
         String ReturnUrl = "http://localhost:8080/share.html?id=" + sb.toString();
 
-        String HdfsPath = "hdfs://maste:9000";
+//        String HdfsPath = "hdfs://maste:9000";
         FileSystem hdfs = null;
         Configuration config = new Configuration();
         config.set("fs.default.name", HdfsPath);
