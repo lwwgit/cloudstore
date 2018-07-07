@@ -67,24 +67,7 @@ public class IconServiceImpl implements IconService {
 
 
 
-    @Override
-    public boolean deleteFile(String filePath) throws IOException {
 
-        FileSystem fs = globalFunction.getHadoopFileSystem();
-        Path path = new Path(filePath);
-
-        //调用deleteOnExit(）
-        boolean flag = fs.deleteOnExit(path);
-        //	fs.delete(path);
-        if(flag) {
-            System.out.println("delete ok!");
-        }else {
-            System.out.println("delete failure");
-        }
-        //关闭文件系统
-        fs.close();
-        return  true;
-    }
 
 
 }

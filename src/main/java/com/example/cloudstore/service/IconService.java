@@ -22,11 +22,4 @@ public interface IconService {
     String uploadImageFile(String src, String dst) throws IOException;
 
 
-    /**
-     * 删除文件或目录
-     * @param filePath
-     * @return
-     * @throws IOException
-     */
-    boolean deleteFile(String filePath) throws IOException;
 }
