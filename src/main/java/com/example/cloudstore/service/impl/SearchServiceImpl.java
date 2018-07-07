@@ -26,13 +26,12 @@ public class SearchServiceImpl implements SearchService {
     @Value("${HDFS_PATH}")
     private String HdfsPath;
     //更改文件服务器地址
-//    static String HdfsPath = "hdfs://maste:9000";
+
 
     @Override
     public List<Map<String, Object>> SearchFile(String SearchWord) throws URISyntaxException, IOException {
         GlobalFunction globalFunction = new GlobalFunction();
         String name = globalFunction.getUsername();
-//        String name = "";
 
 
         FileSystem hdfs = null;
