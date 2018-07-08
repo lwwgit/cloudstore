@@ -925,3 +925,42 @@ Body
     "data": null
 }
 ```
+##目录树
+###获取目录树
+```
+POST /GetTree
+```
+####Request
+Headers
+```
+Content-Type: application/x-www-form-urlencoded
+```
+Body
+```
+{
+    "path": /dir3
+}
+```
+####Response 200
+Headers
+```
+Content-Type: application/json;charset=UTF-8
+```
+Body
+```
+{
+    "Path": "/dir3/shw",
+    "DirName": "shw",
+    "Child": "true"
+  },
+  {
+    "Path": "/dir3/shw2",
+    "DirName": "shw2",
+    "Child": "true"
+  },
+  {
+    "Path": "/dir3/shw3",
+    "DirName": "shw3",
+    "Child": "false"
+  }
+```
