@@ -8,7 +8,6 @@ import com.example.cloudstore.utils.ResultUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
@@ -69,22 +68,22 @@ public class RecoveryFileController {
      * Path newPath = new Path("/hyw/test/huabing");
      */
     @PostMapping("/user/recycle/insert/all")
-    public Result moveToRecycleBin(@RequestBody List<String> oriPaths) throws IOException {
+    public Result moveToRecycleBin(String[] oriPaths) throws IOException {
         String username = globalFunction.getUsername();
         String dstPath = "/" + username + "tmp/";//该用户回收站目录
-        for(int i = 0; i < oriPaths.size(); i++){
-            recoveryFileService.MoveToRecovery(oriPaths.get(i),dstPath);
+        for(String oriPath:oriPaths){
+            recoveryFileService.MoveToRecovery(oriPath,dstPath);
             //将文件或目录源路径插入数据库
             RecoveryFile recoveryFile = new RecoveryFile();
-            if(oriPaths.get(i).lastIndexOf(".") == -1){
+            if(oriPath.lastIndexOf(".") == -1){
                 recoveryFile.setType("dir");
             }else{
-                String suffix = oriPaths.get(i).substring(oriPaths.get(i).lastIndexOf(".") + 1);//文件后缀名
+                String suffix = oriPath.substring(oriPath.lastIndexOf(".") + 1);//文件后缀名
                 recoveryFile.setType(suffix);
             }
-            recoveryFile.setOriginalPath(oriPaths.get(i));
+            recoveryFile.setOriginalPath(oriPath);
             recoveryFile.setUsername(username);
-            String filename = oriPaths.get(i).substring(oriPaths.get(i).lastIndexOf("/") + 1);
+            String filename = oriPath.substring(oriPath.lastIndexOf("/") + 1);
             recoveryFile.setPresentPath(dstPath + filename);
             recoveryFileService.insert(recoveryFile);
         }
@@ -114,13 +113,13 @@ public class RecoveryFileController {
      * @throws IOException
      */
     @PostMapping("/user/recycle/restore/all")
-    public Result restoreRecycleFile(@RequestBody List<Long> ids) throws IOException {
-        for(int i = 0; i < ids.size(); i++) {
-            RecoveryFile recoveryFile = recoveryFileService.findByRecoveryId(ids.get(i));
+    public Result restoreRecycleFile(Long[] ids) throws IOException {
+        for(Long id : ids) {
+            RecoveryFile recoveryFile = recoveryFileService.findByRecoveryId(id);
             String presentPath = recoveryFile.getPresentPath();
             String originalPath = recoveryFile.getOriginalPath();
             recoveryFileService.MoveToRecovery(presentPath, originalPath);
-            recoveryFileService.deleteRecoveryFile(ids.get(i));
+            recoveryFileService.deleteRecoveryFile(id);
         }
         return ResultUtil.success();
     }
@@ -150,12 +149,12 @@ public class RecoveryFileController {
      * @throws IOException
      */
     @PostMapping("/user/recycle/delete/all")
-    public Result deleteRecycleFile(@RequestBody List<Long> ids) throws IOException {
-        for(int i = 0; i < ids.size(); i++) {
-            RecoveryFile recoveryFile = recoveryFileService.findByRecoveryId(ids.get(i));
+    public Result deleteRecycleFile(Long[] ids) throws IOException {
+        for(Long id : ids) {
+            RecoveryFile recoveryFile = recoveryFileService.findByRecoveryId(id);
             String presentPath = recoveryFile.getPresentPath();
             recoveryFileService.deleteFile(presentPath);
-            recoveryFileService.deleteRecoveryFile(ids.get(i));
+            recoveryFileService.deleteRecoveryFile(id);
         }
         return ResultUtil.success();
     }
