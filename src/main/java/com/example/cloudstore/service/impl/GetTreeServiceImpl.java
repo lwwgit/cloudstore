@@ -5,6 +5,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.powermock.core.ListMap;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -32,19 +33,19 @@ public class GetTreeServiceImpl implements GetTreeService {
 
         config.set("fs.default.name", HdfsPath);
         hdfs = FileSystem.get(new URI(HdfsPath), config);
-        Path newpath = new Path(path); //确定搜索文件夹  new Path("/" + dir)，dir为文件夹的绝对路径
-        List<Map<String, Object>> DirMap = new ArrayList<>();
+        Path newpath = new Path(path); //确定搜索文件夹
+        List<Map<String, Object>> dirMap = new ArrayList<>();
 
-        ChildDir(hdfs, newpath, DirMap);
-        for (int i = 0; i < DirMap.size(); i++) {
+        ChildDir(hdfs, newpath, dirMap);
+        for (int i = 0; i < dirMap.size(); i++) {
 //            DirMap.get(i).put("Child", GrandDir(hdfs, new Path(path + "/" + DirMap.get(i).get("DirName"))));
-            DirMap.get(i).put("Child", GrandDir(hdfs, new Path((String) DirMap.get(i).get("Path"))));
+            dirMap.get(i).put("child", GrandDir(hdfs, new Path((String) dirMap.get(i).get("Path"))));
         }
 
-        return DirMap;
+        return dirMap;
     }
 
-    public void ChildDir(FileSystem hdfs, Path path, List<Map<String, Object>> ListMap) throws IOException {
+    public void ChildDir(FileSystem hdfs, Path path, List<Map<String, Object>> listMap) throws IOException {
 
         FileStatus[] files = hdfs.listStatus(path);
 
@@ -52,10 +53,10 @@ public class GetTreeServiceImpl implements GetTreeService {
             if (files[j].isDirectory()) {
                 //递归调用
                 Map<String, Object> list = new HashMap<>();
-                list.put("DirName", files[j].getPath().getName());
+                list.put("dirName", files[j].getPath().getName());
                 String suffix = files[j].getPath().toString().substring(files[j].getPath().toString().lastIndexOf("9000") + 4);
-                list.put("Path", suffix);
-                ListMap.add(list);
+                list.put("path", suffix);
+                listMap.add(list);
             }
         }
     }
