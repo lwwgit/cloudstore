@@ -35,7 +35,7 @@ public class FileSharedServiceImpl implements FileSharedService {
         for (int i = 0; i < 8; i++) {
             sb.append(KeyString.charAt((int) Math.round(Math.random() * (len - 1))));
         }
-        String returnUrl = "http://localhost:8080/share.html?id=" + sb.toString();
+        String returnUrl = "http://localhost:8080/home/share?id=" + sb.toString();
 
 
         FileSystem hdfs = null;
