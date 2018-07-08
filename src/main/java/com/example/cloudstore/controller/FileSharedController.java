@@ -19,8 +19,8 @@ public class FileSharedController {
     @Autowired
     FileSharedService fileSharedService;
 
-    @PostMapping("/GetSharedLink")
-    public String GetSharedLink(@RequestParam("FilePath") String path) throws IOException, URISyntaxException {
+    @PostMapping("/get/shared/link")
+    public String GetSharedLink(@RequestParam("filePath") String path) throws IOException, URISyntaxException {
 
         String result = fileSharedService.CreateSharedLink(path);
 
