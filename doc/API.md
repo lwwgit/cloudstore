@@ -703,7 +703,7 @@ http://localhost:8080/share.html?id=QDD8qup7
 POST /share.html
 ```
 ####Request
-Header
+Headers
 ```
 Content-Type: application/x-www-form-urlencoded
 ```
@@ -712,7 +712,7 @@ Body
 http://localhost:8080/share.html?id=QDD8qup7
 ```
 ####Response 200
-Header
+Headers
 ```
 Content-Type: text/plain;charset=UTF-8
 ```
@@ -725,5 +725,203 @@ Body
   "size": 0,
   "type": "txt",
   "path": "hdfs://maste:9000/dir3/shw/test/test.txt"
+}
+```
+
+##回收站管理
+###文件单个删除进回收站
+```
+post /user/recycle/insert
+```
+####Request
+Headers
+```
+Content-Type: application/x-www-form-urlencoded
+```
+Body
+```
+oriPath  /lww/test.txt
+```
+####Response 200
+Headers
+```
+Content-Type: text/plain;charset=UTF-8
+```
+Body
+```
+{
+    "code": 0,
+    "msg": "成功",
+    "data": null
+}
+```
+
+###多个文件或文件夹删除进回收站
+```
+post  /user/recycle/insert/all
+```
+####Request
+Headers
+```
+Content-Type: application/json
+```
+Body
+```
+["/lww/test2","/lww/test2.c"]
+```
+####Response 200
+Headers
+```
+Content-Type: text/plain;charset=UTF-8
+```
+Body
+```
+{
+    "code": 0,
+    "msg": "成功",
+    "data": null
+}
+```
+###获取回收站文件
+```
+get  /user/recycle/get
+```
+####Response 200
+Headers
+```
+Content-Type: text/plain;charset=UTF-8
+```
+Body
+```
+{
+    "code": 0,
+    "msg": "成功",
+    "data": [
+        {
+            "recoveryId": 8,
+            "username": "lww",
+            "originalPath": "/lww/test2",
+            "presentPath": "/lwwtmp/test2",
+            "type": "dir"
+        },
+        {
+            "recoveryId": 7,
+            "username": "lww",
+            "originalPath": "/lww/test.txt",
+            "presentPath": "/lwwtmp/test.txt",
+            "type": "txt"
+        },
+        {
+            "recoveryId": 9,
+            "username": "lww",
+            "originalPath": "/lww/test2.c",
+            "presentPath": "/lwwtmp/test2.c",
+            "type": "c"
+        }
+    ]
+}
+```
+###单个还原
+```
+post /user/recycle/restore
+```
+####Request
+Headers
+```
+application/x-www-form-urlencoded
+```
+Body
+```
+id 7
+```
+####Response 200
+Headers
+```
+Content-Type: application/json
+```
+Body
+```
+{
+    "code": 0,
+    "msg": "成功",
+    "data": null
+}
+```
+###多个还原
+```
+post   /user/recycle/restore/all
+```
+####Request
+Headers
+```
+Content-Type: application/json
+```
+Body
+```
+["8","9"]
+```
+####Response 200
+Headers
+```
+Content-Type: application/json
+```
+Body
+```
+{
+    "code": 0,
+    "msg": "成功",
+    "data": null
+}
+```
+###单个删除
+```
+post  /user/recycle/delete
+```
+####Request
+Headers
+```
+Content-Type: application/x-www-form-urlencoded
+```
+Body
+```
+id 10
+```
+####Response 200
+Headers
+```
+Content-Type: application/json
+```
+Body
+```
+{
+    "code": 0,
+    "msg": "成功",
+    "data": null
+}
+```
+###多个删除
+```
+post  /user/recycle/delete/all
+```
+####Request
+Headers
+```
+Content-Type: application/json
+```
+Body
+```
+["11","12"]
+```
+####Response 200
+Headers
+```
+Content-Type: application/json
+```
+Body
+```
+{
+    "code": 0,
+    "msg": "成功",
+    "data": null
 }
 ```
