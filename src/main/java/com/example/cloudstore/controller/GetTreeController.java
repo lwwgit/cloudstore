@@ -17,7 +17,7 @@ public class GetTreeController {
     @Autowired
     GetTreeService getTreeService;
 
-    @PostMapping("/GetTree")
+    @PostMapping("/get/tree")
     public List<Map<String, Object>>GetTree(@RequestParam("path") String path) throws IOException, URISyntaxException {
         return getTreeService.FindTree(path);
     }

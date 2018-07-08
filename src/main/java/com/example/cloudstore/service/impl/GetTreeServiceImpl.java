@@ -54,7 +54,7 @@ public class GetTreeServiceImpl implements GetTreeService {
                 //递归调用
                 Map<String, Object> list = new HashMap<>();
                 list.put("dirName", files[j].getPath().getName());
-                String suffix = files[j].getPath().toString().substring(files[j].getPath().toString().lastIndexOf("9000") + 4);
+                String suffix = files[j].getPath().toString().substring(files[j].getPath().toString().indexOf("9000") + 4);
                 list.put("path", suffix);
                 listMap.add(list);
             }
