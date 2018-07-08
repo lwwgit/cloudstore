@@ -27,7 +27,7 @@ public class SortController {
 
     }
 
-    @PostMapping("/SearchFile")
+    @PostMapping("/search/file")
     public List<Map<String, Object>> SearchFile(@RequestParam("SearchWord") String SearchWord) throws IOException, URISyntaxException {
         return searchService.SearchFile(SearchWord);
     }
