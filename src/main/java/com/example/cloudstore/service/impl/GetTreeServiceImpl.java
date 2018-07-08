@@ -38,8 +38,8 @@ public class GetTreeServiceImpl implements GetTreeService {
 
         ChildDir(hdfs, newpath, dirMap);
         for (int i = 0; i < dirMap.size(); i++) {
-//            DirMap.get(i).put("Child", GrandDir(hdfs, new Path(path + "/" + DirMap.get(i).get("DirName"))));
-            dirMap.get(i).put("child", GrandDir(hdfs, new Path((String) dirMap.get(i).get("Path"))));
+//            dirMap.get(i).put("child", GrandDir(hdfs, new Path(path + "/" + dirMap.get(i).get("dirName"))));
+            dirMap.get(i).put("child", GrandDir(hdfs, new Path((String) dirMap.get(i).get("path"))));
         }
 
         return dirMap;
