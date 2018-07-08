@@ -68,7 +68,10 @@ public class SearchServiceImpl implements SearchService {
                 while (matcher.find()) {
                     Map<String, Object> list = new HashMap<>();
                     list.put("Name", files[i].getPath().getName());
-                    list.put("Path", files[i].getPath().toString());
+
+                    String truePath = files[i].getPath().toString().substring(files[i].getPath().toString().lastIndexOf("9000") + 4);
+                    list.put("Path", truePath);
+//                    list.put("Path", files[i].getPath().toString());
                     list.put("ModificationTime", formatter.format(files[i].getModificationTime()));
                     list.put("length", files[i].getLen());
                     list.put("type", suffix);
