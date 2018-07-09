@@ -715,7 +715,7 @@ Content-Type: application/x-www-form-urlencoded
 Body
 ```
 {
-    "filePath": /dir3
+    "filePath": /dir3, /dir1/test1.docx, /dir3/shw/pjpj.jpg
 }
 ```
 ####Response
@@ -728,7 +728,7 @@ Body
 {
   "code": 0,
   "msg": "成功",
-  "data": "http://localhost:8080/home/share?id=HeGKN7Gx"
+  "data":  "http://localhost:8080/home/share?id=cDvo4bDK"
 }
 ```
 
@@ -743,7 +743,7 @@ Content-Type: application/x-www-form-urlencoded
 ```
 Body
 ```
-"http://localhost:8080/home/share?id=HeGKN7Gx"
+"http://localhost:8080/home/share?id=cDvo4bDK"
 ```
 ####Response 200
 Headers
@@ -755,14 +755,35 @@ Body
 {
   "code": 0,
   "msg": "成功",
-  "data": {
-    "id": "HeGKN7Gx",
-    "filename": "dir3",
-    "owner": "victo",
-    "size": 0,
-    "type": "dir",
-    "path": "/dir3"
-  }
+  "data": [
+    {
+      "id": 32,
+      "charId": "cDvo4bDK",
+      "filename": "dir3",
+      "owner": "victo",
+      "size": 71051702,
+      "type": "dir",
+      "path": "/dir3"
+    },
+    {
+      "id": 33,
+      "charId": "cDvo4bDK",
+      "filename": "test1.docx",
+      "owner": "victo",
+      "size": 0,
+      "type": "docx",
+      "path": "/dir1/test1.docx"
+    },
+    {
+      "id": 34,
+      "charId": "cDvo4bDK",
+      "filename": "pjpj.jpg",
+      "owner": "victo",
+      "size": 25424,
+      "type": "jpg",
+      "path": "/dir3/shw/pjpj.jpg"
+    }
+  ]
 }
 ```
 
