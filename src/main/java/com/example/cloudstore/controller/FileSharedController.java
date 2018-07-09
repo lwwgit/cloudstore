@@ -1,7 +1,6 @@
 package com.example.cloudstore.controller;
 
 import com.example.cloudstore.domain.Result;
-import com.example.cloudstore.domain.entity.FileShared;
 import com.example.cloudstore.service.FileSharedService;
 import com.example.cloudstore.utils.ResultUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,9 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 @RestController
 public class FileSharedController {
@@ -22,9 +18,11 @@ public class FileSharedController {
     FileSharedService fileSharedService;
 
     @PostMapping("/get/shared/link")
-    public Result GetSharedLink(@RequestParam("filePath") String path) throws IOException, URISyntaxException {
+    public Result GetSharedLink(@RequestParam("filePath") String[] paths) throws IOException, URISyntaxException {
 
-        return ResultUtil.success(fileSharedService.CreateSharedLink(path));
+        System.out.println("批量分享: " + paths);
+
+        return ResultUtil.success(fileSharedService.CreateSharedLink(paths));
     }
 
     @PostMapping("/home/share")

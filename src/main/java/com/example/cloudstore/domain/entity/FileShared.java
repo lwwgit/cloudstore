@@ -1,12 +1,18 @@
 package com.example.cloudstore.domain.entity;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 @Entity
 public class FileShared {
+
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Integer id;
+
+    private String charId;
 
     /**** 分享的文件名 ***/
     private String filename;
@@ -19,12 +25,20 @@ public class FileShared {
     /**** 文件路径 ****/
     private String path;
 
-    public String getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Integer id) {
         this.id = id;
+    }
+
+    public String getCharId() {
+        return charId;
+    }
+
+    public void setCharId(String charId) {
+        this.charId = charId;
     }
 
     public String getFilename() {
