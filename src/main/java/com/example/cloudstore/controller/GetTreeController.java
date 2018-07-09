@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 public class GetTreeController {
@@ -18,7 +20,7 @@ public class GetTreeController {
     GetTreeService getTreeService;
 
     @PostMapping("/get/tree")
-    public Result GetTree(@RequestParam("path") String path) throws IOException, URISyntaxException {
-        return ResultUtil.success(getTreeService.FindTree(path));
+    public List<Map<String,Object>> GetTree(@RequestParam("path") String path) throws IOException, URISyntaxException {
+        return getTreeService.FindTree(path);
     }
 }

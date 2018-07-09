@@ -11,12 +11,10 @@ import java.net.URI;
 
 public class HDFS_Downloader
 {
-    @Value("${HDFS_PATH}")
-    private static String HDFS_PATH;
-    
-    public static FileSystem hdfs;
 
-    
+    //TODO 此处下面需要更改hdfs地址
+
+    public static FileSystem hdfs;
 
     public static void downloadFile(String srcPath, String dstPath) throws Exception
     {
@@ -56,7 +54,7 @@ public class HDFS_Downloader
     public static void download(String srcPath, String dstPath) throws Exception
     {
         Configuration conf = new Configuration();
-        URI uri = new URI(HDFS_PATH);
+        URI uri = new URI("hdfs://192.168.150.134:9000/");
         hdfs = FileSystem.get(uri, conf);
         if (hdfs.isFile(new Path(srcPath)))
         {

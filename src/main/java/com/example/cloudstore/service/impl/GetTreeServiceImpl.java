@@ -61,15 +61,15 @@ public class GetTreeServiceImpl implements GetTreeService {
         }
     }
 
-    public String GrandDir(FileSystem hdfs, Path path) throws IOException {
+    public Boolean GrandDir(FileSystem hdfs, Path path) throws IOException {
 
         FileStatus[] files = hdfs.listStatus(path);
 
         for (int k = 0; k < files.length; k++) {
             if (files[k].isDirectory()) {
-                return "true";
+                return false;
             }
         }
-        return "false";
+        return true;
     }
 }
