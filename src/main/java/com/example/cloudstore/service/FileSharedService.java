@@ -4,10 +4,10 @@ import com.example.cloudstore.domain.entity.FileShared;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.Optional;
+import java.util.List;
 
 public interface FileSharedService {
-    String CreateSharedLink(String path) throws URISyntaxException, IOException;
+    String CreateSharedLink(String[] paths) throws URISyntaxException, IOException;
 
-    Optional<FileShared> ToShared(String id);
+    List<FileShared> ToShared(String id);
 }
