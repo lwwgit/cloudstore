@@ -176,8 +176,10 @@ public class PreviewOnlieController {
     //取消预览之后，调用此接口
     @PostMapping("/pdfDelete")
     public JsonResult pdfDelete(@RequestParam String deletePath) {
+        String Name = deletePath.substring(deletePath.lastIndexOf("/")+1);
+        String Path = localName + Name;
         JsonResult result = new JsonResult();
-        File file = new File(deletePath);
+        File file = new File(Path);
         boolean i = file.delete();//删除文件
         if(i==true){
             result.setStatus("删除成功");

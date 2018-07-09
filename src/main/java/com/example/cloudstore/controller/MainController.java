@@ -126,13 +126,6 @@ public class MainController {
 
 		for (String fileDelPath : fileDelPaths) {
 			JsonResult jsonResult = new JsonResult();
-			//获取该文件的文件信息
-			//Integer Id = id.get(i);
-			//System.out.println(Id);
-			//Fdir fdir = fileService.findFile(Id);
-			//fileService.deleteFile(Id);
-			//找到该文件的文件hdfs路径
-			//String deleteName = fdir.getFilepath();
 
 			String deleteName = fileDelPath;
 			Path deletePath = new Path(deleteName);
@@ -328,47 +321,40 @@ public class MainController {
 			@ApiImplicitParam(name = "newFatherPath", value = "要移动到的文件夹的路径", required = true, dataType = "String", paramType = "query"),
 	})
 	public JsonResult move(@RequestParam String oldDirPath , @RequestParam String newFatherPath) throws URISyntaxException{
-		//找到旧文件的信息
-	//	Fdir fdir = fileService.findFile(id);
-	//	String oldname = fdir.getFilepath().substring(fdir.getFilepath().lastIndexOf("/")+1);
-	//	String oldDirPath = fdir.getFilepath();
-		//找到新文件的存储目录信息
-//		Fdir fdir1 = fileService.findFile(pid);
-
-		// 文件的名字
-		String oldname = oldDirPath.substring(oldDirPath.lastIndexOf("/")+1);
-		// 文件的新hdfs全路径
-		String newDirPath = newFatherPath +"/" + oldname;
-
-		Path newPath = new Path(newDirPath);
-		Path oldHdfsPath = new Path(oldDirPath); //文件的全路径
-		FileSystem fileSystem;
 		JsonResult result = new JsonResult();
 		Configuration conf = new Configuration();
 		URI uri = new URI(HDFS_PATH);
+		String oldname = oldDirPath.substring(oldDirPath.lastIndexOf("/")+1); // test2
+		// 文件的新hdfs全路径
+		String newDirPath = newFatherPath +"/" + oldname; //   /zlw/test1/test2
+
+		Path newPath = new Path(newDirPath); // /zlw/test1/test2
+		Path newfatherPath = new Path(newFatherPath); // zlw/test1
+		Path oldHdfsPath = new Path(oldDirPath); //文件的旧全路径 /zlw/test2
+		FileSystem fileSystem;
+
 		try {
 			fileSystem = FileSystem.get(uri, conf);
-			if (!fileSystem.exists(newPath)) {
-				result.setStatus("新文件夹不存在！");
+			if (!fileSystem.exists(newfatherPath)) {
+				result.setStatus("移动失败");
+				result.setResult("新文件夹不存在！");
+			}else if(newFatherPath.equals(oldDirPath)){
+				result.setStatus("移动失败");
+				result.setResult("不能移动到本文件夹");
+			} else if(fileSystem.exists(newPath)){
+				result.setStatus("移动失败");
+				result.setResult("该文件下已经存在相同名字的文件");
 			} else{
-				Path newHdfsPath = new Path(newDirPath + "/" + oldDirPath.substring(oldDirPath.lastIndexOf("/") + 1));
-				FileStatus fileStatus = fileSystem.getFileStatus(newPath);
-				if(fileStatus.isDirectory())
-				{
-					fileSystem.rename(oldHdfsPath,newHdfsPath);
-				//	fileService.setFile(fdir.getId(),pid,newDirPath);
+					fileSystem.rename(oldHdfsPath,newPath);
 					result.setStatus("移动成功");
-				} else {
-					result.setStatus("移动失败，请选择文件夹");
-				}
+					result.setResult(result.getStatus() + "，已经移动到： 文件夹" + newDirPath +"中");
 			}
-			result.setResult(newDirPath.substring(newDirPath.lastIndexOf("/") + 1));
 		} catch (IOException e) {
 			e.printStackTrace();
 			result.setResult(e.getMessage());
 			result.setStatus("移动失败！");
 		}
-		System.out.println(result.getStatus() + "，已经移动到： 文件夹" + result.getResult() +"中");
+		System.out.println(result);
 		return result;
 	}
 }
