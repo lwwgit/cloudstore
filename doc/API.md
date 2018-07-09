@@ -444,80 +444,86 @@ Body
 ####Response 200
 Headers
 ```
-Content-Type: text/plain;charset=UTF-8
+Content-Type: text/plain;
 ```
 Body
 ```
 {
-    "Path": "hdfs://maste:9000/dir1/test1.docx",
-    "length": 0,
-    "ModificationTime": "2018-07-03 10:27",
-    "type": "docx",
-    "Name": "test1.docx"
-  },
-  {
-    "Path": "hdfs://maste:9000/dir1/test1.pptx",
-    "length": 0,
-    "ModificationTime": "2018-07-03 10:26",
-    "type": "pptx",
-    "Name": "test1.pptx"
-  },
-  {
-    "Path": "hdfs://maste:9000/dir2/test1.xlsx",
-    "length": 6610,
-    "ModificationTime": "2018-07-03 10:28",
-    "type": "xlsx",
-    "Name": "test1.xlsx"
-  },
-  {
-    "Path": "hdfs://maste:9000/dir2/test3.pptx",
-    "length": 0,
-    "ModificationTime": "2018-07-03 10:28",
-    "type": "pptx",
-    "Name": "test3.pptx"
-  },
-  {
-    "Path": "hdfs://maste:9000/dir3/详细报表.txt",
-    "length": 10035,
-    "ModificationTime": "2018-07-04 09:37",
-    "type": "txt",
-    "Name": "详细报表.txt"
-  },
-  {
-    "Path": "hdfs://maste:9000/dir3/shw/软件开发需求文档模板.pdf",
-    "length": 401185,
-    "ModificationTime": "2018-07-04 09:37",
-    "type": "pdf",
-    "Name": "软件开发需求文档模板.pdf"
-  },
-  {
-    "Path": "hdfs://maste:9000/dir3/shw/软件详细设计文档模板.doc",
-    "length": 275969,
-    "ModificationTime": "2018-07-04 09:35",
-    "type": "doc",
-    "Name": "软件详细设计文档模板.doc"
-  },
-  {
-    "Path": "hdfs://maste:9000/dir3/shw/test/test.txt",
-    "length": 0,
-    "ModificationTime": "2018-06-29 11:14",
-    "type": "txt",
-    "Name": "test.txt"
-  },
-  {
-    "Path": "hdfs://maste:9000/dir3/test2.docx",
-    "length": 0,
-    "ModificationTime": "2018-07-03 10:29",
-    "type": "docx",
-    "Name": "test2.docx"
-  },
-  {
-    "Path": "hdfs://maste:9000/dir3/test2.pptx",
-    "length": 0,
-    "ModificationTime": "2018-07-03 10:29",
-    "type": "pptx",
-    "Name": "test2.pptx"
-  }
+    "code": 0,
+    "msg": "成功",
+    "data":[
+        {
+            "path": "hdfs://maste:9000/dir1/test1.docx",
+            "length": 0,
+            "modificationTime": "2018-07-03 10:27",
+            "type": "docx",
+            "name": "test1.docx"
+          },
+          {
+            "path": "hdfs://maste:9000/dir1/test1.pptx",
+            "length": 0,
+            "modificationTime": "2018-07-03 10:26",
+            "type": "pptx",
+            "name": "test1.pptx"
+          },
+          {
+            "path": "hdfs://maste:9000/dir2/test1.xlsx",
+            "length": 6610,
+            "modificationTime": "2018-07-03 10:28",
+            "type": "xlsx",
+            "name": "test1.xlsx"
+          },
+          {
+            "path": "hdfs://maste:9000/dir2/test3.pptx",
+            "length": 0,
+            "modificationTime": "2018-07-03 10:28",
+            "type": "pptx",
+            "name": "test3.pptx"
+          },
+          {
+            "path": "hdfs://maste:9000/dir3/详细报表.txt",
+            "length": 10035,
+            "modificationTime": "2018-07-04 09:37",
+            "type": "txt",
+            "name": "详细报表.txt"
+          },
+          {
+            "path": "hdfs://maste:9000/dir3/shw/软件开发需求文档模板.pdf",
+            "length": 401185,
+            "modificationTime": "2018-07-04 09:37",
+            "type": "pdf",
+            "name": "软件开发需求文档模板.pdf"
+          },
+          {
+            "path": "hdfs://maste:9000/dir3/shw/软件详细设计文档模板.doc",
+            "length": 275969,
+            "modificationTime": "2018-07-04 09:35",
+            "type": "doc",
+            "name": "软件详细设计文档模板.doc"
+          },
+          {
+            "path": "hdfs://maste:9000/dir3/shw/test/test.txt",
+            "length": 0,
+            "modificationTime": "2018-06-29 11:14",
+            "type": "txt",
+            "name": "test.txt"
+          },
+          {
+            "path": "hdfs://maste:9000/dir3/test2.docx",
+            "length": 0,
+            "modificationTime": "2018-07-03 10:29",
+            "type": "docx",
+            "name": "test2.docx"
+          },
+          {
+            "path": "hdfs://maste:9000/dir3/test2.pptx",
+            "length": 0,
+            "modificationTime": "2018-07-03 10:29",
+            "type": "pptx",
+            "name": "test2.pptx"
+          }
+    ]
+ }
 ```
 ####Request (获取图片类型的文件)
 Headers
@@ -534,24 +540,30 @@ Body
 ####Response 200
 Headers
 ```
-Content-Type: text/plain;charset=UTF-8
+Content-Type: text/plain;
 ```
 Body
 ```
 {
-    "Path": "hdfs://maste:9000/dir1/龙母.jpg",
-    "length": 25798,
-    "ModificationTime": "2018-07-04 09:35",
-    "type": "jpg",
-    "Name": "龙母.jpg"
-  },
-  {
-    "Path": "hdfs://maste:9000/dir3/shw/pjpj.jpg",
-    "length": 25424,
-    "ModificationTime": "2018-06-28 16:15",
-    "type": "jpg",
-    "Name": "pjpj.jpg"
-  }
+    "code": 0,
+    "msg": "成功",
+    "data":[
+      {
+        "path": "hdfs://maste:9000/dir1/龙母.jpg",
+        "length": 25798,
+        "modificationTime": "2018-07-04 09:35",
+        "type": "jpg",
+        "name": "龙母.jpg"
+       },
+      {
+        "path": "hdfs://maste:9000/dir3/shw/pjpj.jpg",
+        "length": 25424,
+        "modificationTime": "2018-06-28 16:15",
+        "type": "jpg",
+        "name": "pjpj.jpg"
+      }
+    ]
+ }
 ```
 ####Request (获取视频类型的文件)
 Headers
@@ -568,7 +580,7 @@ Body
 ####Response 200
 Headers
 ```
-Content-Type: text/plain;charset=UTF-8
+Content-Type: text/plain;
 ```
 Body
 ```
@@ -589,24 +601,30 @@ Body
 ####Response 200
 Headers
 ```
-Content-Type: text/plain;charset=UTF-8
+Content-Type: text/plain;
 ```
 Body
 ```
-  {
-    "Path": "hdfs://maste:9000/dir1/Troye Sivan - WILD.mp3",
-    "length": 8830245,
-    "ModificationTime": "2018-07-04 09:57",
-    "type": "mp3",
-    "Name": "Troye Sivan - WILD.mp3"
-  },
-  {
-    "Path": "hdfs://maste:9000/dir3/shw/BTS - DNA.flac",
-    "length": 29212161,
-    "ModificationTime": "2018-07-04 09:56",
-    "type": "flac",
-    "Name": "BTS - DNA.flac"
-  }
+{
+    "code": 0,
+    "msg": "成功",
+    "data":[
+      {
+        "path": "hdfs://maste:9000/dir1/Troye Sivan - WILD.mp3",
+        "length": 8830245,
+        "modificationTime": "2018-07-04 09:57",
+        "type": "mp3",
+        "name": "Troye Sivan - WILD.mp3"
+       },
+     {
+        "path": "hdfs://maste:9000/dir3/shw/BTS - DNA.flac",
+        "length": 29212161,
+        "modificationTime": "2018-07-04 09:56",
+        "type": "flac",
+        "name": "BTS - DNA.flac"
+     }
+   ]
+ }
 ```
 ####Request (获取其他类型的文件)
 Headers
@@ -623,21 +641,27 @@ Body
 ####Response 200
 Headers
 ```
-Content-Type: text/plain;charset=UTF-8
+Content-Type: text/plain;
 ```
 Body
 ```
-{
-    "Path": "hdfs://maste:9000/dir3/Git-2.18.0-64-bit.exe",
-    "length": 41126928,
-    "ModificationTime": "2018-07-04 09:58",
-    "type": "exe",
-    "Name": "Git-2.18.0-64-bit.exe"
+ {
+    "code": 0,
+    "msg": "成功",
+    "data":[
+      {
+        "path": "hdfs://maste:9000/dir3/Git-2.18.0-64-bit.exe",
+        "length": 41126928,
+        "modificationTime": "2018-07-04 09:58",
+        "type": "exe",
+        "name": "Git-2.18.0-64-bit.exe"
+      }
+    ]
  }
 ```
 ###文件查找
 ```
-POST /SearchFile
+POST /search/file
 ```
 ####Request
 Headers
@@ -653,29 +677,35 @@ Body
 ####Response 200
 Headers
 ```
-Content-Type: text/plain;charset=UTF-8
+Content-Type: text/plain
 ```
 Body
 ```
 {
-    "Path": "hdfs://maste:9000/dir3/shw/软件开发需求文档模板.pdf",
-    "length": 401185,
-    "ModificationTime": "2018-07-04 09:37",
-    "type": "pdf",
-    "Name": "软件开发需求文档模板.pdf"
-  },
-  {
-    "Path": "hdfs://maste:9000/dir3/shw/软件详细设计文档模板.doc",
-    "length": 275969,
-    "ModificationTime": "2018-07-04 09:35",
-    "type": "doc",
-    "Name": "软件详细设计文档模板.doc"
-  }
+    "code": 0,
+    "msg": "成功",
+    "data":[
+      {
+        "path": "hdfs://maste:9000/dir3/shw/软件开发需求文档模板.pdf",
+        "length": 401185,
+        "modificationTime": "2018-07-04 09:37",
+        "type": "pdf",
+        "name": "软件开发需求文档模板.pdf"
+      },
+      {
+        "path": "hdfs://maste:9000/dir3/shw/软件详细设计文档模板.doc",
+        "length": 275969,
+        "modificationTime": "2018-07-04 09:35",
+        "type": "doc",
+        "name": "软件详细设计文档模板.doc"
+       }
+    ]
+ }
 ```
 ##文件分享
 ###生成分享链接
 ```
-POST /GetSharedLink
+POST /get/shared/link
 ```
 ####Request
 Headers
@@ -685,7 +715,7 @@ Content-Type: application/x-www-form-urlencoded
 Body
 ```
 {
-    "FilePath": hdfs://maste:9000/dir3/shw/test/test.txt
+    "filePath": /dir3
 }
 ```
 ####Response
@@ -695,12 +725,16 @@ Content-Type: text/plain;charset=UTF-8
 ```
 Body
 ```
-http://localhost:8080/share.html?id=QDD8qup7
+{
+  "code": 0,
+  "msg": "成功",
+  "data": "http://localhost:8080/home/share?id=HeGKN7Gx"
+}
 ```
 
 ###查看分享文件
 ```
-POST /share.html
+POST /home/share
 ```
 ####Request
 Headers
@@ -709,7 +743,7 @@ Content-Type: application/x-www-form-urlencoded
 ```
 Body
 ```
-http://localhost:8080/share.html?id=QDD8qup7
+"http://localhost:8080/home/share?id=HeGKN7Gx"
 ```
 ####Response 200
 Headers
@@ -719,12 +753,16 @@ Content-Type: text/plain;charset=UTF-8
 Body
 ```
 {
-  "id": "QDD8qup7",
-  "filename": "test.txt",
-  "owner": "shw",
-  "size": 0,
-  "type": "txt",
-  "path": "hdfs://maste:9000/dir3/shw/test/test.txt"
+  "code": 0,
+  "msg": "成功",
+  "data": {
+    "id": "HeGKN7Gx",
+    "filename": "dir3",
+    "owner": "victo",
+    "size": 0,
+    "type": "dir",
+    "path": "hdfs://maste:9000/dir3"
+  }
 }
 ```
 
@@ -928,7 +966,7 @@ Body
 ##目录树
 ###获取目录树
 ```
-POST /GetTree
+POST /get/tree
 ```
 ####Request
 Headers
@@ -944,23 +982,29 @@ Body
 ####Response 200
 Headers
 ```
-Content-Type: application/json;charset=UTF-8
+Content-Type: application/json
 ```
 Body
 ```
 {
-    "Path": "/dir3/shw",
-    "DirName": "shw",
-    "Child": "true"
-  },
-  {
-    "Path": "/dir3/shw2",
-    "DirName": "shw2",
-    "Child": "true"
-  },
-  {
-    "Path": "/dir3/shw3",
-    "DirName": "shw3",
-    "Child": "false"
-  }
+  "code": 0,
+  "msg": "成功",
+  "data": [
+    {
+      "path": "/dir3/shw",
+      "dirName": "shw",
+      "child": "true"
+    },
+    {
+      "path": "/dir3/shw2",
+      "dirName": "shw2",
+      "child": "true"
+    },
+    {
+      "path": "/dir3/shw3",
+      "dirName": "shw3",
+      "child": "false"
+    }
+  ]
+}
 ```
