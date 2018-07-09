@@ -4,9 +4,12 @@ package com.example.cloudstore.controller;
 
 import com.example.cloudstore.utils.HDFS_Downloader;
 import com.example.cloudstore.utils.ZipUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
+import javax.annotation.Resources;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedInputStream;
 import java.io.File;
