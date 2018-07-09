@@ -453,70 +453,70 @@ Body
     "msg": "成功",
     "data":[
         {
-            "path": "hdfs://maste:9000/dir1/test1.docx",
+            "path": "/dir1/test1.docx",
             "length": 0,
             "modificationTime": "2018-07-03 10:27",
             "type": "docx",
             "name": "test1.docx"
           },
           {
-            "path": "hdfs://maste:9000/dir1/test1.pptx",
+            "path": "/dir1/test1.pptx",
             "length": 0,
             "modificationTime": "2018-07-03 10:26",
             "type": "pptx",
             "name": "test1.pptx"
           },
           {
-            "path": "hdfs://maste:9000/dir2/test1.xlsx",
+            "path": "/dir2/test1.xlsx",
             "length": 6610,
             "modificationTime": "2018-07-03 10:28",
             "type": "xlsx",
             "name": "test1.xlsx"
           },
           {
-            "path": "hdfs://maste:9000/dir2/test3.pptx",
+            "path": "/dir2/test3.pptx",
             "length": 0,
             "modificationTime": "2018-07-03 10:28",
             "type": "pptx",
             "name": "test3.pptx"
           },
           {
-            "path": "hdfs://maste:9000/dir3/详细报表.txt",
+            "path": "/dir3/详细报表.txt",
             "length": 10035,
             "modificationTime": "2018-07-04 09:37",
             "type": "txt",
             "name": "详细报表.txt"
           },
           {
-            "path": "hdfs://maste:9000/dir3/shw/软件开发需求文档模板.pdf",
+            "path": "/dir3/shw/软件开发需求文档模板.pdf",
             "length": 401185,
             "modificationTime": "2018-07-04 09:37",
             "type": "pdf",
             "name": "软件开发需求文档模板.pdf"
           },
           {
-            "path": "hdfs://maste:9000/dir3/shw/软件详细设计文档模板.doc",
+            "path": "/dir3/shw/软件详细设计文档模板.doc",
             "length": 275969,
             "modificationTime": "2018-07-04 09:35",
             "type": "doc",
             "name": "软件详细设计文档模板.doc"
           },
           {
-            "path": "hdfs://maste:9000/dir3/shw/test/test.txt",
+            "path": "/dir3/shw/test/test.txt",
             "length": 0,
             "modificationTime": "2018-06-29 11:14",
             "type": "txt",
             "name": "test.txt"
           },
           {
-            "path": "hdfs://maste:9000/dir3/test2.docx",
+            "path": "/dir3/test2.docx",
             "length": 0,
             "modificationTime": "2018-07-03 10:29",
             "type": "docx",
             "name": "test2.docx"
           },
           {
-            "path": "hdfs://maste:9000/dir3/test2.pptx",
+            "path": "/dir3/test2.pptx",
             "length": 0,
             "modificationTime": "2018-07-03 10:29",
             "type": "pptx",
@@ -549,14 +549,14 @@ Body
     "msg": "成功",
     "data":[
       {
-        "path": "hdfs://maste:9000/dir1/龙母.jpg",
+        "path": "/dir1/龙母.jpg",
         "length": 25798,
         "modificationTime": "2018-07-04 09:35",
         "type": "jpg",
         "name": "龙母.jpg"
        },
       {
-        "path": "hdfs://maste:9000/dir3/shw/pjpj.jpg",
+        "path": "/dir3/shw/pjpj.jpg",
         "length": 25424,
         "modificationTime": "2018-06-28 16:15",
         "type": "jpg",
@@ -610,14 +610,14 @@ Body
     "msg": "成功",
     "data":[
       {
-        "path": "hdfs://maste:9000/dir1/Troye Sivan - WILD.mp3",
+        "path": "/dir1/Troye Sivan - WILD.mp3",
         "length": 8830245,
         "modificationTime": "2018-07-04 09:57",
         "type": "mp3",
         "name": "Troye Sivan - WILD.mp3"
        },
      {
-        "path": "hdfs://maste:9000/dir3/shw/BTS - DNA.flac",
+        "path": "/dir3/shw/BTS - DNA.flac",
         "length": 29212161,
         "modificationTime": "2018-07-04 09:56",
         "type": "flac",
@@ -650,7 +650,7 @@ Body
     "msg": "成功",
     "data":[
       {
-        "path": "hdfs://maste:9000/dir3/Git-2.18.0-64-bit.exe",
+        "path": "/dir3/Git-2.18.0-64-bit.exe",
         "length": 41126928,
         "modificationTime": "2018-07-04 09:58",
         "type": "exe",
@@ -686,14 +686,14 @@ Body
     "msg": "成功",
     "data":[
       {
-        "path": "hdfs://maste:9000/dir3/shw/软件开发需求文档模板.pdf",
+        "path": "/dir3/shw/软件开发需求文档模板.pdf",
         "length": 401185,
         "modificationTime": "2018-07-04 09:37",
         "type": "pdf",
         "name": "软件开发需求文档模板.pdf"
       },
       {
-        "path": "hdfs://maste:9000/dir3/shw/软件详细设计文档模板.doc",
+        "path": "/dir3/shw/软件详细设计文档模板.doc",
         "length": 275969,
         "modificationTime": "2018-07-04 09:35",
         "type": "doc",
@@ -761,7 +761,7 @@ Body
     "owner": "victo",
     "size": 0,
     "type": "dir",
-    "path": "hdfs://maste:9000/dir3"
+    "path": "/dir3"
   }
 }
 ```
