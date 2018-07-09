@@ -1,5 +1,8 @@
 package com.example.cloudstore.controller;
+import com.example.cloudstore.domain.Result;
+import com.example.cloudstore.service.SearchService;
 import com.example.cloudstore.service.SortService;
+import com.example.cloudstore.utils.ResultUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,13 +17,19 @@ public class SortController {
     @Autowired
     private SortService sortService;
 
+    @Autowired
+    private SearchService searchService;
+
     @PostMapping("/sort")
-    public List<Map<String, Object>> SortFile( int flag) throws IOException, URISyntaxException {
+    public Result SortFile(Integer flag) throws IOException, URISyntaxException {
 
-//        System.out.println("######" + flag);
         List<Map<String,Object>> list = sortService.SortFile(flag);
-//        System.out.println("##########" + list);
-        return list;
+        return ResultUtil.success(list);
 
+    }
+
+    @PostMapping("/search/file")
+    public Result SearchFile(@RequestParam("searchWord") String SearchWord) throws IOException, URISyntaxException {
+        return ResultUtil.success(searchService.SearchFile(SearchWord));
     }
 }
