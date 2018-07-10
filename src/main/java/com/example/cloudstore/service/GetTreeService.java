@@ -13,5 +13,5 @@ public interface GetTreeService {
 
     void ChildDir(FileSystem hdfs, Path path, List<Map<String, Object>> ListMap) throws IOException;
 
-    String GrandDir(FileSystem hdfs, Path path) throws IOException;
+    boolean GrandDir(FileSystem hdfs, Path path) throws IOException;
 }
