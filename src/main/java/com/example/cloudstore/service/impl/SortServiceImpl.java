@@ -52,8 +52,6 @@ public class SortServiceImpl implements SortService {
                 "avi", "mov", "mp4", "wmv", "mkv", "flv",
                 "wav", "mp3", "wma", "aac", "flac"};
 
-
-
         ShowFile(hdfs, path, ListMap, flag, doc, pict, video, music, other);
         return ListMap;
     }
@@ -79,14 +77,13 @@ public class SortServiceImpl implements SortService {
                 String suffix = name.substring(name.lastIndexOf(".") + 1);
 
                 Map<String, Object> list = new HashMap<>();
-                list.put("Name", files[i].getPath().getName());
+                list.put("name", files[i].getPath().getName());
 
                 String truePath = files[i].getPath().toString().substring(files[i].getPath().toString().indexOf("9000") + 4);
-                list.put("Path", truePath);
-                list.put("ModificationTime", formatter.format(files[i].getModificationTime()));
-                list.put("length", files[i].getLen());
+                list.put("path", truePath);
+                list.put("modificationTime", formatter.format(files[i].getModificationTime()));
+                list.put("length", globalFunction.getFileSize(files[i].getLen()));
                 list.put("type", globalFunction.getFileType(suffix));
-
 
                 if (flag == 1) {
                     for (int j = 0; j < doc.length; j++) {
