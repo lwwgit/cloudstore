@@ -74,7 +74,7 @@ public class SearchServiceImpl implements SearchService {
                     String truePath = files[i].getPath().toString().substring(files[i].getPath().toString().lastIndexOf("9000") + 4);
                     list.put("path", truePath);
                     list.put("modificationTime", formatter.format(files[i].getModificationTime()));
-                    list.put("length", files[i].getLen());
+                    list.put("length", globalFunction.getFileSize(files[i].getLen()));
                     list.put("type", globalFunction.getFileType(suffix));
 
                     listMap.add(list);
