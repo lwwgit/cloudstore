@@ -54,15 +54,15 @@ public class FileSharedServiceImpl implements FileSharedService {
 
             String name = file.getPath().getName();
             String type = null;
-            Long size = null;
+            String size = null;
             if (file.isFile()) {
                 String suffix = name.substring(name.lastIndexOf(".") + 1);
                 type = globalFunction.getFileType(suffix);
-                size = file.getLen();
+                size = globalFunction.getFileSize(file.getLen());
             }
             if (file.isDirectory()) {
                 type = "folder";
-                size = hdfs.getContentSummary(new Path(path)).getLength();
+                size = globalFunction.getFileSize(hdfs.getContentSummary(new Path(path)).getLength());
             }
 
             FileShared fileShared = new FileShared();
