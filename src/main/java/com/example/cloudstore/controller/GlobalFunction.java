@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.DecimalFormat;
 
 @Component
 public class GlobalFunction {
@@ -119,6 +120,25 @@ public class GlobalFunction {
         return "others";
     }
 
+    //文件大小转换
+    public String getFileSize(long filesize) {
+        StringBuffer mstrbuf = new StringBuffer();
+        DecimalFormat df = new DecimalFormat("#.00");
+        if (filesize < 1024) {
+            mstrbuf.append(filesize);
+            mstrbuf.append(" B");
+        } else if (filesize < 1024*1024) {
+            mstrbuf.append(df.format((double) filesize / 1024));
+            mstrbuf.append(" K");
+        } else if (filesize < 1024*1024*1024) {
+            mstrbuf.append(df.format((double) filesize / (1024*1024)));
+            mstrbuf.append(" M");
+        } else {
+            mstrbuf.append(df.format((double) filesize / (1024*1024*1024)));
+            mstrbuf.append(" G");
+        }
+        return mstrbuf.toString();
+    }
 
     //获取文件夹大小
     public String getDirectorySize(String path) throws URISyntaxException, IOException {
