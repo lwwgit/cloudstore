@@ -51,6 +51,7 @@ public class SearchServiceImpl implements SearchService {
 
     public void ReturnSearch(FileSystem hdfs, Path path, List<Map<String, Object>> listMap, Pattern pattern) throws IOException {
 
+        GlobalFunction globalFunction = new GlobalFunction();
         FileStatus[] files = hdfs.listStatus(path);//获取目录下所有文件（包括目录）的信息
 
         //设置时间格式
@@ -72,10 +73,9 @@ public class SearchServiceImpl implements SearchService {
 
                     String truePath = files[i].getPath().toString().substring(files[i].getPath().toString().lastIndexOf("9000") + 4);
                     list.put("path", truePath);
-//                    list.put("Path", files[i].getPath().toString());
                     list.put("modificationTime", formatter.format(files[i].getModificationTime()));
                     list.put("length", files[i].getLen());
-                    list.put("type", suffix);
+                    list.put("type", globalFunction.getFileType(suffix));
 
                     listMap.add(list);
                 }
