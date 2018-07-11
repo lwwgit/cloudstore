@@ -19,7 +19,7 @@ public class FileShared {
     /***** 文件拥有者 ***/
     private String owner;
     /***** 文件大小 ****/
-    private double size;
+    private String size;
     /****** 文件类型 ****/
     private String type;
     /**** 文件路径 ****/
@@ -57,11 +57,11 @@ public class FileShared {
         this.owner = owner;
     }
 
-    public double getSize() {
+    public String getSize() {
         return size;
     }
 
-    public void setSize(double size) {
+    public void setSize(String size) {
         this.size = size;
     }
 

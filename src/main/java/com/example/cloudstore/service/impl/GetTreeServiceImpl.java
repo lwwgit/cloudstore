@@ -5,7 +5,6 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.powermock.core.ListMap;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -39,7 +38,7 @@ public class GetTreeServiceImpl implements GetTreeService {
         ChildDir(hdfs, newpath, dirMap);
         for (int i = 0; i < dirMap.size(); i++) {
 //            dirMap.get(i).put("child", GrandDir(hdfs, new Path(path + "/" + dirMap.get(i).get("dirName"))));
-            dirMap.get(i).put("child", GrandDir(hdfs, new Path((String) dirMap.get(i).get("path"))));
+            dirMap.get(i).put("leaf", GrandDir(hdfs, new Path((String) dirMap.get(i).get("path"))));
         }
 
         return dirMap;
@@ -61,7 +60,7 @@ public class GetTreeServiceImpl implements GetTreeService {
         }
     }
 
-    public Boolean GrandDir(FileSystem hdfs, Path path) throws IOException {
+    public boolean GrandDir(FileSystem hdfs, Path path) throws IOException {
 
         FileStatus[] files = hdfs.listStatus(path);
 

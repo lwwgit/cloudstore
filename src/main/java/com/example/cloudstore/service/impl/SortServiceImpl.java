@@ -41,10 +41,11 @@ public class SortServiceImpl implements SortService {
         Path path = new Path("/" + name);/**********确定用户文件夹  new Path("/" + name)***********/
         List<Map<String, Object>> ListMap = new ArrayList<>();
 
-        String[] doc = new String[]{"docx", "doc", "xlsx", "xls", "pptx", "ppt", "txt", "pdf"};
-        String[] pict = new String[]{"jpg", "png", "gif", "jpeg"};
+        //文件分类
+        String[] doc = new String[]{"docx", "doc", "xlsx", "xls", "pptx", "ppt", "txt", "pdf", "c"};
+        String[] pict = new String[]{"jpg", "png", "gif", "jpeg", "bmp"};
         String[] video = new String[]{"avi", "mov", "mp4", "wmv", "mkv", "flv"};
-        String[] music = new String[]{"wav", "mp3", "wma", "aac", "flac"};
+        String[] music = new String[]{"wav", "mp3", "wma", "aac", "flac", "ram", "m4a"};
         String[] other = new String[]{
                 "docx", "doc", "xlsx", "xls", "pptx", "ppt", "txt", "pdf",
                 "jpg", "png", "gif", "jpeg",
@@ -60,6 +61,8 @@ public class SortServiceImpl implements SortService {
                          String[] doc, String[] pict, String[] video,
                          String[] music, String[] other) throws IOException {
 
+        GlobalFunction globalFunction = new GlobalFunction();
+
         FileStatus[] files = hdfs.listStatus(path);
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         //展示文件信息
@@ -74,14 +77,13 @@ public class SortServiceImpl implements SortService {
                 String suffix = name.substring(name.lastIndexOf(".") + 1);
 
                 Map<String, Object> list = new HashMap<>();
-                list.put("Name", files[i].getPath().getName());
+                list.put("name", files[i].getPath().getName());
 
                 String truePath = files[i].getPath().toString().substring(files[i].getPath().toString().indexOf("9000") + 4);
-                list.put("Path", truePath);
-//                list.put("Path", files[i].getPath().toString());
-                list.put("ModificationTime", formatter.format(files[i].getModificationTime()));
-                list.put("length", files[i].getLen());
-                list.put("type", suffix);
+                list.put("path", truePath);
+                list.put("modificationTime", formatter.format(files[i].getModificationTime()));
+                list.put("length", globalFunction.getFileSize(files[i].getLen()));
+                list.put("type", globalFunction.getFileType(suffix));
 
                 if (flag == 1) {
                     for (int j = 0; j < doc.length; j++) {
