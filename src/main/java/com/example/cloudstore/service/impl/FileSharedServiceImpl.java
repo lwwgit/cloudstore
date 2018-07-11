@@ -1,5 +1,6 @@
 package com.example.cloudstore.service.impl;
 
+import com.example.cloudstore.controller.GlobalFunction;
 import com.example.cloudstore.domain.entity.FileShared;
 import com.example.cloudstore.repository.FileSharedRepository;
 import com.example.cloudstore.service.FileSharedService;
@@ -9,7 +10,6 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -29,6 +29,8 @@ public class FileSharedServiceImpl implements FileSharedService {
 
     @Override
     public String CreateSharedLink(String[] paths) throws URISyntaxException, IOException {
+
+        GlobalFunction globalFunction = new GlobalFunction();
 
         String KeyString = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         StringBuffer sb = new StringBuffer();
@@ -52,14 +54,15 @@ public class FileSharedServiceImpl implements FileSharedService {
 
             String name = file.getPath().getName();
             String type = null;
-            Long size = null;
+            String size = null;
             if (file.isFile()) {
-                type = name.substring(name.lastIndexOf(".") + 1);
-                size = file.getLen();
+                String suffix = name.substring(name.lastIndexOf(".") + 1);
+                type = globalFunction.getFileType(suffix);
+                size = globalFunction.getFileSize(file.getLen());
             }
             if (file.isDirectory()) {
-                type = "dir";
-                size = hdfs.getContentSummary(new Path(path)).getLength();
+                type = "folder";
+                size = globalFunction.getFileSize(hdfs.getContentSummary(new Path(path)).getLength());
             }
 
             FileShared fileShared = new FileShared();
@@ -67,7 +70,6 @@ public class FileSharedServiceImpl implements FileSharedService {
             fileShared.setFilename(name);
             fileShared.setOwner(file.getOwner());
             String savePath = file.getPath().toString().substring(file.getPath().toString().lastIndexOf("9000") + 4);
-//            fileShared.setPath(file.getPath().toString());
             fileShared.setPath(savePath);
             fileShared.setSize(size);
             fileShared.setType(type);
