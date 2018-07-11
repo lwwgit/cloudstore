@@ -42,8 +42,6 @@ public class MainController {
 		if (!file.isEmpty()) {
 			try {
 				String fileName = file.getOriginalFilename();
-				//String mulupath = fileService.findFile(id).getFilepath();
-				//	System.out.println(mulupath);
 				//存储文件的hdfs全路径
 				String srcName = mulupath + "/" + fileName;
 
@@ -82,7 +80,7 @@ public class MainController {
 		}
 		return ResponseEntity.ok(result);
 	}
-		// 将文件上传到HDFS
+	// 将文件上传到HDFS
 	private JsonResult uploadHDFS(File file,String srcName,String mulu) throws URISyntaxException {
 		JsonResult result = new JsonResult();
 
@@ -117,42 +115,6 @@ public class MainController {
 		return result;
 	}
 
-
-	//删除文件（已完成）//todo 有疑问，只是传递了字符串。
-	@ApiOperation(value = "删除文件", notes = "文件全路径")
-	@RequestMapping(value = "/delete", method = RequestMethod.POST)
-	public List<JsonResult> deleteHDFS(@RequestParam String[] fileDelPaths) throws URISyntaxException {
-		List<JsonResult> results = new ArrayList<>();
-
-		for (String fileDelPath : fileDelPaths) {
-			JsonResult jsonResult = new JsonResult();
-
-			String deleteName = fileDelPath;
-			Path deletePath = new Path(deleteName);
-			Configuration conf = new Configuration();
-			URI uri = new URI(HDFS_PATH);
-			FileSystem fileSystem;
-			try {
-				fileSystem = FileSystem.get(uri, conf);
-				if (!fileSystem.exists(deletePath)) {
-					jsonResult.setStatus("文件不存在");
-				} else {
-					fileSystem.delete(deletePath, true);
-					jsonResult.setStatus("删除成功！");
-				}
-				jsonResult.setResult(deleteName);
-			} catch (IOException e) {
-				e.printStackTrace();
-				jsonResult.setResult(e.getMessage());
-				jsonResult.setStatus("删除失败！");
-			}
-			System.out.println(jsonResult.getStatus() + ": " + jsonResult.getResult());
-			results.add(jsonResult);
-		}
-		return results;
-	}
-
-
 	//创建文件夹(已完成)
 	@ApiOperation(value = "创建文件夹", notes = "文件全路径")
 	@RequestMapping(value = "/mkdir", method = RequestMethod.POST)
@@ -161,17 +123,10 @@ public class MainController {
 			@ApiImplicitParam(name = "fileName", value = "创建该文件的文件名", required = true, dataType = "String", paramType = "query"),
 	})
 	public JsonResult mkdirMulu(@RequestParam String pPath, @RequestParam String fileName) throws URISyntaxException {
-		//获取该文件父目录的信息
-	//	Fdir fdir = fileService.findFile(id);
-		//获取父目录的全路径
-	//	String pPath = fdir.getFilepath();
 
 		//拼接成创建文件夹的hdfs全路径
 		String muluName = pPath +"/"+ fileName;
 		System.out.println("Path:"+pPath+" "+"filename:"+fileName);
-		//在数据表里添加数据，下表中的id，其实
-	//	fileService.mkdirFile(id, muluName);
-
 		JsonResult result = new JsonResult();
 		Configuration conf = new Configuration();
 		Path muluPath = new Path(muluName);
@@ -203,8 +158,6 @@ public class MainController {
 			@ApiImplicitParam(name = "muluName", value = "要查看文件夹的全路径", required = true, dataType = "String", paramType = "query"),
 	})
 	public JsonResult lookdir(@RequestParam String muluName) throws URISyntaxException {
-	//	Fdir fdir = fileService.findFile(id);
-	//	String muluName = fdir.getFilepath();
 		System.out.println("muluName:"+muluName);
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 		JsonResult result = new JsonResult();
@@ -242,17 +195,19 @@ public class MainController {
 					if(K>=1024 && M>=1024 && G<1024) {dir.setSize(G+" GB");}
 					if(G>=1024){dir.setSize(G+" GB");}
 					String type = "";
+					String fileType = "";
 					if(isDir.equals("文件夹")){
 						type  = "folder";
 						dir.setType(type);
 					}else{
 						type = fileName.substring(fileName.lastIndexOf(".")+1);
-						dir.setType(type);
+						fileType = Type(type);
+						dir.setType(fileType);
 					}
 					dir.setPath(Path);
 					dir.setTime(Time);
 					dir.setFileName(fileName);
-					System.out.println(isDir + "\t" + len + "\t" + Path + "\t" + fileName + "\t" + Time +"\t"+type);
+					System.out.println(isDir + "\t" + len + "\t" + Path + "\t" + fileName + "\t" + Time + "\t" + type+"|"+fileType);
 					dirs.add(dir);
 				}
 				result.setStatus("查看成功");
@@ -276,13 +231,6 @@ public class MainController {
 			@ApiImplicitParam(name = "newName", value = "文件的新的名字", required = true, dataType = "String", paramType = "query"),
 	})
 	public JsonResult rename(@RequestParam String oldPath, @RequestParam String newName) throws URISyntaxException{
-		//Fdir fdir = fileService.findFile(id);
-		//获取原来的名字
-		//String oldPath = fdir.getFilepath();
-		//Fdir fdir1 = fileService.findFile(fdir.getPid());
-		//拼接成新的hdfs新路径
-		//String newPath = fdir1.getFilepath()+"/"+newName;
-		//
 		System.out.println("oldpath:"+oldPath+" "+"newName:"+newName);
 		String oldFileName = oldPath.substring(oldPath.lastIndexOf("/")+1);
 		String oldFatherName = oldPath.substring(0,oldPath.length()-oldFileName.length());
@@ -300,7 +248,6 @@ public class MainController {
 				result.setStatus("文件已经存在！");
 			} else{
 				fileSystem.rename(oldHdfsPath,newHdfsPath);
-			//	fileService.setFile(id,fdir.getPid(),newPath);
 				result.setStatus("修改成功");
 			}
 			result.setResult(newName.substring(newName.lastIndexOf("/") + 1));
@@ -313,48 +260,118 @@ public class MainController {
 		return result;
 	}
 
+	//删除文件（已完成）//todo 有疑问，只是传递了字符串。
+	@ApiOperation(value = "删除文件", notes = "文件全路径")
+	@RequestMapping(value = "/delete", method = RequestMethod.POST)
+	public List<JsonResult> deleteHDFS(@RequestParam String[] fileDelPaths) throws URISyntaxException {
+		List<JsonResult> results = new ArrayList<>();
+
+		for (String fileDelPath : fileDelPaths) {
+			JsonResult jsonResult = new JsonResult();
+
+			String deleteName = fileDelPath;
+			Path deletePath = new Path(deleteName);
+			Configuration conf = new Configuration();
+			URI uri = new URI(HDFS_PATH);
+			FileSystem fileSystem;
+			try {
+				fileSystem = FileSystem.get(uri, conf);
+				if (!fileSystem.exists(deletePath)) {
+					jsonResult.setStatus("文件不存在");
+				} else {
+					fileSystem.delete(deletePath, true);
+					jsonResult.setStatus("删除成功！");
+				}
+				jsonResult.setResult(deleteName);
+			} catch (IOException e) {
+				e.printStackTrace();
+				jsonResult.setResult(e.getMessage());
+				jsonResult.setStatus("删除失败！");
+			}
+			System.out.println(jsonResult.getStatus() + ": " + jsonResult.getResult());
+			results.add(jsonResult);
+		}
+		return results;
+	}
+
 	//移动文件夹(已完成)
 	@ApiOperation(value = "移动文件夹", notes = "新旧文件夹的全路径")
 	@RequestMapping(value = "/move", method = RequestMethod.POST)
 	@ApiImplicitParams({
-			@ApiImplicitParam(name = "oldDirPath", value = "要移动的文件的路径", required = true, dataType = "String", paramType = "query"),
+			@ApiImplicitParam(name = "oldDirPaths", value = "要移动的文件的路径", required = true, dataType = "String", paramType = "query"),
 			@ApiImplicitParam(name = "newFatherPath", value = "要移动到的文件夹的路径", required = true, dataType = "String", paramType = "query"),
 	})
-	public JsonResult move(@RequestParam String oldDirPath , @RequestParam String newFatherPath) throws URISyntaxException{
-		JsonResult result = new JsonResult();
+	public List<JsonResult> move(@RequestParam String[] oldDirPaths , @RequestParam String newFatherPath) throws URISyntaxException{
+		List<JsonResult> results = new ArrayList<>();
 		Configuration conf = new Configuration();
 		URI uri = new URI(HDFS_PATH);
-		String oldname = oldDirPath.substring(oldDirPath.lastIndexOf("/")+1); // test2
-		// 文件的新hdfs全路径
-		String newDirPath = newFatherPath +"/" + oldname; //   /zlw/test1/test2
+		for (String oldDirPath : oldDirPaths) {
+			JsonResult result = new JsonResult();
+			String oldname = oldDirPath.substring(oldDirPath.lastIndexOf("/") + 1); // test2
+			 /*文件的新hdfs全路径*/
+			String newDirPath = newFatherPath + "/" + oldname; //   /zlw/test1/test2
 
-		Path newPath = new Path(newDirPath); // /zlw/test1/test2
-		Path newfatherPath = new Path(newFatherPath); // zlw/test1
-		Path oldHdfsPath = new Path(oldDirPath); //文件的旧全路径 /zlw/test2
-		FileSystem fileSystem;
-
-		try {
-			fileSystem = FileSystem.get(uri, conf);
-			if (!fileSystem.exists(newfatherPath)) {
-				result.setStatus("移动失败");
-				result.setResult("新文件夹不存在！");
-			}else if(newFatherPath.equals(oldDirPath)){
-				result.setStatus("移动失败");
-				result.setResult("不能移动到本文件夹");
-			} else if(fileSystem.exists(newPath)){
-				result.setStatus("移动失败");
-				result.setResult("该文件下已经存在相同名字的文件");
-			} else{
-					fileSystem.rename(oldHdfsPath,newPath);
+			Path newPath = new Path(newDirPath); // /zlw/test1/test2
+			Path newfatherPath = new Path(newFatherPath); // zlw/test1
+			Path oldHdfsPath = new Path(oldDirPath); //文件的旧全路径 /zlw/test2
+			FileSystem fileSystem;
+			try {
+				fileSystem = FileSystem.get(uri, conf);
+				if (!fileSystem.exists(newfatherPath)) {
+					result.setStatus("移动失败");
+					result.setResult("新文件夹不存在！");
+				} else if (newFatherPath.equals(oldDirPath) || newFatherPath.startsWith(oldDirPath.substring(0,oldDirPath.length()))) {
+					result.setStatus("移动失败");
+					result.setResult(newDirPath.substring(newDirPath.lastIndexOf("/")+1)+"不能移动到本文件夹或其子文件夹下");
+				} else if (fileSystem.exists(newPath)) {
+					result.setStatus("移动失败");
+					result.setResult("该目录下已经存在"+newDirPath.substring(newDirPath.lastIndexOf("/")+1));
+				} else {
+					fileSystem.rename(oldHdfsPath, newPath);
 					result.setStatus("移动成功");
-					result.setResult(result.getStatus() + "，已经移动到： 文件夹" + newDirPath +"中");
+					result.setResult(result.getStatus());
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+				result.setResult(e.getMessage());
+				result.setStatus("移动失败！");
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
-			result.setResult(e.getMessage());
-			result.setStatus("移动失败！");
+			results.add(result);
 		}
-		System.out.println(result);
-		return result;
+		return results;
 	}
+
+	//判断文件类型
+	public String Type(String type) {
+		if(type.equals("jpg")||type.equals("png")||type.equals("gif")||type.equals("gpeg")||type.equals("pic")){
+			return "img";
+		}
+		if (type.equals("zip")|| type.equals("rar")||type.equals("gz")){
+			return "zip";
+		}
+		if (type.equals("avi")|| type.equals("mov") || type.equals("swf")|| type.equals("mpg")|| type.equals("mp4")){
+			return "video";
+		}
+		if (type.equals("c")|| type.equals("java")|| type.equals("py")|| type.equals("cpp")|| type.equals("vue")){
+			return "code";
+		}
+		if (type.equals("doc")|| type.equals("docx")){
+			return "doc";
+		}
+		if (type.equals("ppt")|| type.equals("pptx")){
+			return "ppt";
+		}
+		if (type.equals("xls")|| type.equals("xlsx")){
+			return "xls";
+		}
+		if (type.equals("wmv")|| type.equals("aif")||type.equals("mp3")|| type.equals("au")||type.equals("ram")|| type.equals("wam")){
+			return "music";
+		}
+		if (type.equals("txt")){
+			return "txt";
+		}
+		return "others";
+	}
+
+
 }
