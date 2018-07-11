@@ -3,14 +3,18 @@ package com.example.cloudstore.controller;
 
 import com.example.cloudstore.domain.Result;
 import com.example.cloudstore.domain.entity.RecoveryFile;
+import com.example.cloudstore.service.CopyFileService;
 import com.example.cloudstore.service.RecoveryFileService;
 import com.example.cloudstore.utils.ResultUtil;
+import org.apache.hadoop.fs.FileStatus;
+import org.apache.hadoop.fs.Path;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 @RestController
@@ -19,6 +23,10 @@ public class RecoveryFileController {
     private RecoveryFileService recoveryFileService;
     @Autowired
     private GlobalFunction globalFunction;
+    @Autowired
+    private CopyFileService copyFileService;
+
+
 
     /**
      * 获取回收站所有文件
@@ -36,31 +44,36 @@ public class RecoveryFileController {
      * @return
      * @throws IOException
      */
-    @PostMapping("/user/recycle/insert")
-    public Result moveToRecycleBin(String oriPath) throws IOException {
-        System.out.println("删除的源文件为 ：" + oriPath);
-
-        String username = globalFunction.getUsername();
-        String dstPath = "/" + username + "tmp/";//该用户回收站目录
-
-        recoveryFileService.MoveToRecovery(oriPath,dstPath);
-        //将文件或目录源路径插入数据库
-        RecoveryFile recoveryFile = new RecoveryFile();
-
-        if(oriPath.lastIndexOf(".") == -1){
-            recoveryFile.setType("dir");
-        }else{
-            String suffix = oriPath.substring(oriPath.lastIndexOf(".") + 1);//文件后缀名
-            recoveryFile.setType(suffix);
-        }
-
-        recoveryFile.setOriginalPath(oriPath);
-        recoveryFile.setUsername(username);
-        String filename = oriPath.substring(oriPath.lastIndexOf("/") + 1);
-        recoveryFile.setPresentPath(dstPath + filename);
-        recoveryFileService.insert(recoveryFile);
-        return ResultUtil.success();
-    }
+//    @PostMapping("/user/recycle/insert")
+//    public Result moveToRecycleBin(String oriPath) throws IOException {
+//        String username = globalFunction.getUsername();
+//        String dstPath = "/" + username + "tmp/";//该用户回收站目录
+//
+//        recoveryFileService.MoveToRecovery(oriPath,dstPath);
+//        //将文件或目录源路径插入数据库
+//        RecoveryFile recoveryFile = new RecoveryFile();
+//
+//        if(oriPath.lastIndexOf(".") == -1){
+//            recoveryFile.setType("folder");
+//        }else{
+//            String suffix = oriPath.substring(oriPath.lastIndexOf(".") + 1);//文件后缀名
+//            String type = globalFunction.getFileType(suffix);
+//            recoveryFile.setType(type);
+//        }
+//        String filename = oriPath.substring(oriPath.lastIndexOf("/") + 1);
+//        Path path = new Path(dstPath + filename);
+//        FileStatus[] files = globalFunction.getHadoopFileSystem().listStatus(path);
+//        for (int i = 0; i < files.length; i++) {
+//            recoveryFile.setSize(files[i].getLen());
+//        }
+//        recoveryFile.setPresentPath(dstPath + filename);
+//        recoveryFile.setOriginalPath(oriPath);
+//        recoveryFile.setUsername(username);
+//        recoveryFile.setDelTime(new Date());
+//        recoveryFile.setFileName(filename);
+//        recoveryFileService.insert(recoveryFile);
+//        return ResultUtil.success();
+//    }
 
     /**
      * 文件批量删除进回收站
@@ -69,22 +82,34 @@ public class RecoveryFileController {
      */
     @PostMapping("/user/recycle/insert/all")
     public Result moveToRecycleBin(String[] oriPaths) throws IOException {
+
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         String username = globalFunction.getUsername();
         String dstPath = "/" + username + "tmp/";//该用户回收站目录
         for(String oriPath:oriPaths){
             recoveryFileService.MoveToRecovery(oriPath,dstPath);
+
             //将文件或目录源路径插入数据库
             RecoveryFile recoveryFile = new RecoveryFile();
+            String filename = oriPath.substring(oriPath.lastIndexOf("/") + 1);
             if(oriPath.lastIndexOf(".") == -1){
-                recoveryFile.setType("dir");
+                recoveryFile.setType("folder");
             }else{
-                String suffix = oriPath.substring(oriPath.lastIndexOf(".") + 1);//文件后缀名
-                recoveryFile.setType(suffix);
+                String suffixName = oriPath.substring(oriPath.lastIndexOf(".") + 1);
+                String fileType = globalFunction.getFileType(suffixName);
+                recoveryFile.setType(fileType);
             }
+
+            Path path = new Path(dstPath + filename);
+            FileStatus file = globalFunction.getHadoopFileSystem().getFileStatus(path);
+            recoveryFile.setLen(file.getLen());
+            recoveryFile.setDelTime(formatter.format(file.getModificationTime()));
+            recoveryFile.setSize(globalFunction.getFileSize(file.getLen()));
+
             recoveryFile.setOriginalPath(oriPath);
             recoveryFile.setUsername(username);
-            String filename = oriPath.substring(oriPath.lastIndexOf("/") + 1);
             recoveryFile.setPresentPath(dstPath + filename);
+            recoveryFile.setFileName(filename);
             recoveryFileService.insert(recoveryFile);
         }
         return ResultUtil.success();
@@ -101,9 +126,13 @@ public class RecoveryFileController {
         RecoveryFile recoveryFile = recoveryFileService.findByRecoveryId(id);
         String presentPath  = recoveryFile.getPresentPath();
         String originalPath = recoveryFile.getOriginalPath();
-        recoveryFileService.MoveToRecovery(presentPath,originalPath);
-        recoveryFileService.deleteRecoveryFile(id);
-        return ResultUtil.success();
+        if(copyFileService.checkIsExist(originalPath) == false) {
+            recoveryFileService.MoveToRecovery(presentPath, originalPath);
+            recoveryFileService.deleteRecoveryFile(id);
+            return ResultUtil.success();
+        }else {
+            return ResultUtil.error(1,"还原失败，文件（夹）已存在");
+        }
     }
 
     /**
@@ -114,6 +143,13 @@ public class RecoveryFileController {
      */
     @PostMapping("/user/recycle/restore/all")
     public Result restoreRecycleFile(Long[] ids) throws IOException {
+        for(Long checkId : ids) {
+            RecoveryFile checkRecoveryFile = recoveryFileService.findByRecoveryId(checkId);
+            String checkOriginalPath = checkRecoveryFile.getOriginalPath();
+            if(copyFileService.checkIsExist(checkOriginalPath) == true) {
+                return ResultUtil.error(1,"还原失败，文件（夹）已存在");
+            }
+        }
         for(Long id : ids) {
             RecoveryFile recoveryFile = recoveryFileService.findByRecoveryId(id);
             String presentPath = recoveryFile.getPresentPath();
@@ -158,4 +194,23 @@ public class RecoveryFileController {
         }
         return ResultUtil.success();
     }
+
+
+    /**
+     * 清空回收站
+     * @return
+     * @throws IOException
+     */
+    @PostMapping("/user/delete/all")
+    public Result deleteAllRecycleFile() throws IOException {
+        String username = globalFunction.getUsername();
+        List<RecoveryFile> recoveryFiles = recoveryFileService.findByUsername(username);
+        for(int i=0; i<recoveryFiles.size(); i++){
+            String presentPath = recoveryFiles.get(i).getPresentPath();
+            recoveryFileService.deleteFile(presentPath);
+            recoveryFileService.deleteRecoveryFile(recoveryFiles.get(i).getRecoveryId());
+        }
+        return ResultUtil.success();
+    }
+
 }

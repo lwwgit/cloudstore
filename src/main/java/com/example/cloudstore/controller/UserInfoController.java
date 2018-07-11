@@ -112,23 +112,21 @@ public class UserInfoController {
             try {
                 String src = file.getOriginalFilename();
 
-                BufferedOutputStream out = new BufferedOutputStream(
-                        new FileOutputStream(
-                                new File(src)
-                        )
-                );
-
+                BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(new File(src)));
                 out.write(file.getBytes());
-
                 out.flush();
                 out.close();
 
-
                 String IconPath = iconService.uploadImageFile(src,dst);
-                //插入数据库
-                UserInfo userInfo = userInfoService.findByUsername(username);
-                userInfo.setIcon(IconPath);
-                userInfoService.insert(userInfo);
+                if (IconPath != null) {
+                    //插入数据库
+                    UserInfo userInfo = userInfoService.findByUsername(username);
+                    userInfo.setIcon(IconPath);
+                    userInfoService.insert(userInfo);
+                    return ResultUtil.success();
+                }else {
+                    return ResultUtil.error(1,"上传失败");
+                }
 
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
@@ -137,9 +135,6 @@ public class UserInfoController {
                 e.printStackTrace();
                 return ResultUtil.error(1,"上传失败, " + e.getMessage());
             }
-
-
-            return ResultUtil.success();
 
         } else {
             return ResultUtil.error(1,"上传失败,文件为空");
