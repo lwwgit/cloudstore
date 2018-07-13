@@ -2,7 +2,9 @@ package com.example.cloudstore.service.impl;
 
 
 import com.example.cloudstore.domain.Constants;
+import com.example.cloudstore.domain.Md5;
 import com.example.cloudstore.domain.MultipartFileParam;
+import com.example.cloudstore.repository.Md5Repository;
 import com.example.cloudstore.service.MyStorageService;
 import com.example.cloudstore.utils.FileMD5Util;
 
@@ -39,6 +41,8 @@ public class MyStorageServiceImpl implements MyStorageService {
 
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
+    @Autowired
+    private Md5Repository md5Repository;
 
     //这个必须与前端设定的值一致
     @Value("${breakpoint.upload.chunkSize}")
@@ -137,8 +141,11 @@ public class MyStorageServiceImpl implements MyStorageService {
             if (flag)
                 System.out.println("重命名成功了！");
             File file = new File(uploadDirPath+"/"+fileName);
-            if (file.exists())
-                uploadToHdfsService.uploadHdfs(uploadDirPath+"/"+fileName,"/");
+            if (file.exists()){
+                Md5 tmp = md5Repository.findByFileMd5AndFileName(param.getMd5(), param.getName());
+                uploadToHdfsService.uploadHdfs(uploadDirPath+"/"+fileName,tmp.getPath());
+            }
+
             else
                 System.out.println("文件出错了！");
             System.out.println("upload complete !!" + flag + " name=" + fileName);

@@ -17,11 +17,12 @@ public class Md5 {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
-    private Integer uid;
+    private String uid;
+    private String path;
 
     private String fileName;
 
-    private String md5;
+    private String fileMd5;
 
 //    @Column(name = "create_time")
     private Date createTime;
@@ -37,11 +38,11 @@ public class Md5 {
         this.id = id;
     }
 
-    public Integer getUid() {
+    public String getUid() {
         return uid;
     }
 
-    public void setUid(Integer uid) {
+    public void setUid(String uid) {
         this.uid = uid;
     }
 
@@ -53,12 +54,12 @@ public class Md5 {
         this.fileName = fileName;
     }
 
-    public String getMd5() {
-        return md5;
+    public String getFileMd5() {
+        return fileMd5;
     }
 
-    public void setMd5(String md5) {
-        this.md5 = md5;
+    public void setFileMd5(String fileMd5) {
+        this.fileMd5 = fileMd5;
     }
 
     public Date getCreateTime() {
@@ -75,5 +76,13 @@ public class Md5 {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
     }
 }
