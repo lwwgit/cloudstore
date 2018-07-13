@@ -6,7 +6,6 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.powermock.core.ListMap;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -69,12 +68,13 @@ public class SearchServiceImpl implements SearchService {
                 Matcher matcher = pattern.matcher(files[i].getPath().getName());
                 while (matcher.find()) {
                     Map<String, Object> list = new HashMap<>();
-                    list.put("name", files[i].getPath().getName());
+                    list.put("fileName", files[i].getPath().getName());
 
                     String truePath = files[i].getPath().toString().substring(files[i].getPath().toString().lastIndexOf("9000") + 4);
                     list.put("path", truePath);
-                    list.put("modificationTime", formatter.format(files[i].getModificationTime()));
-                    list.put("length", globalFunction.getFileSize(files[i].getLen()));
+                    list.put("time", formatter.format(files[i].getModificationTime()));
+                    list.put("size", globalFunction.getFileSize(files[i].getLen()));
+                    list.put("length", files[i].getLen());
                     list.put("type", globalFunction.getFileType(suffix));
 
                     listMap.add(list);
