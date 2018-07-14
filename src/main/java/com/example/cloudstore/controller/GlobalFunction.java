@@ -21,6 +21,7 @@ import java.text.DecimalFormat;
 public class GlobalFunction {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
+
     @Value("${HDFS_PATH}")
     private String HADOOP_URL;
 
@@ -42,15 +43,25 @@ public class GlobalFunction {
         return null;
     }
 
+
+    /**
+     * 获取文件夹大小
+     * **/
     public String getDirectorySize(String path) throws URISyntaxException, IOException {
+
+        /**
+         * 这里必须重新声明一下HADOOP_URL
+         * 不然识别不出来
+         * 不要问我为什么
+         * 因为宝宝也不知道
+         **/
+
+        String HADOOP_URL = "hdfs://192.168.220.135:9000/";
         FileSystem hdfs = null;
         Configuration config = new Configuration();
         // 程序配置
         config.set("fs.default.name", HADOOP_URL);
-        //config.set("hadoop.job.ugi", "feng,111111");
-        //config.set("hadoop.tmp.dir", "/tmp/hadoop-fengClient");
-        //config.set("dfs.replication", "1");
-        //config.set("mapred.job.tracker", "master:9001");
+
         hdfs = FileSystem.get(new URI(HADOOP_URL), config);
 //        Path path = new Path("/");
         Path newPath = new Path(path);
@@ -58,7 +69,7 @@ public class GlobalFunction {
 //        System.out.println("dir3的文件夹大小是：" + hdfs.getContentSummary(new Path(path)).getLength());
 
         if (fileStatus.isDirectory()){
-            return String.valueOf(hdfs.getContentSummary(new Path(path)).getLength());
+            return String.valueOf(getFileSize(hdfs.getContentSummary(new Path(path)).getLength()));
         }
         if (fileStatus.isFile()){
             return "Error. It's not a directory";
