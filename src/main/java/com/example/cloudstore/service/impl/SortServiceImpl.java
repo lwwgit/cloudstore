@@ -1,17 +1,22 @@
 package com.example.cloudstore.service.impl;
 
 import com.example.cloudstore.controller.GlobalFunction;
+import com.example.cloudstore.domain.entity.UserStore;
+import com.example.cloudstore.repository.UserStoreRepository;
 import com.example.cloudstore.service.SortService;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,6 +25,9 @@ import java.util.Map;
 
 @Service
 public class SortServiceImpl implements SortService {
+
+    @Autowired
+    UserStoreRepository userStoreRepository;
 
     @Value("${HDFS_PATH}")
     private String HdfsPath;
@@ -67,10 +75,11 @@ public class SortServiceImpl implements SortService {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         //展示文件信息
         for (int i = 0; i < files.length; i++) {
-            if (files[i].isDirectory())
+            if (files[i].isDirectory()) {
                 //递归调用
                 ShowFile(hdfs, files[i].getPath(), ListMap, flag, doc, pict, video, music, other);
 
+            }
             if (files[i].isFile()) {
 
                 String name = files[i].getPath().getName();
@@ -133,5 +142,60 @@ public class SortServiceImpl implements SortService {
                 }
             }
         }
+    }
+
+    @Override
+    public List<Map<String, Object>> SortCapacity() throws IOException, URISyntaxException {
+        GlobalFunction globalFunction = new GlobalFunction();
+
+        List<Map<String, Object>> returnList = new ArrayList<>();
+        for (int flag = 1; flag <= 5; flag++) {
+            Map<String, Object> map = new HashMap<>();
+            if (flag == 1) {
+                map.put("type", "doc");
+            }
+            if (flag == 2) {
+                map.put("type", "pict");
+            }
+            if (flag == 3) {
+                map.put("type", "video");
+            }
+            if (flag == 4) {
+                map.put("type", "music");
+            }
+            if (flag == 5) {
+                map.put("type", "other");
+            }
+
+            List<Map<String, Object>> list = SortFile(flag);
+
+            //获取length, size, availableCapacity这些变量
+            long length = 0;
+            for (int i = 0; i < list.size(); i++) {
+                length += Long.valueOf(list.get(i).get("length").toString());
+            }
+            String size = globalFunction.getFileSize(length);
+//                String username = globalFunction.getUsername();
+            String username = "lww";
+            UserStore userStore = userStoreRepository.findByUsername(username);
+            String availableCapacity = userStore.getAvailableCapacity();
+
+            //计算已用空间的百分比
+            float numOnly = Float.valueOf(StringUtils.substringBefore(availableCapacity, "G"));
+            float num1 = length;
+            float num2 = numOnly;
+            NumberFormat numberFormat = NumberFormat.getInstance();
+            numberFormat.setMaximumFractionDigits(2); //保留两位小数
+            String scale = numberFormat.format(num1 / (num2 * 1024 * 1024 * 1024));
+
+            //添加数据，生成map
+            map.put("length", length);
+            map.put("size", size);
+            map.put("avaliableCapacity", availableCapacity);
+            map.put("scale", scale);
+
+            returnList.add(map);
+        }
+        return returnList;
     }
 }
