@@ -51,7 +51,7 @@ public class SortServiceImpl implements SortService {
 
         //文件分类
         String[] doc = new String[]{"docx", "doc", "xlsx", "xls", "pptx", "ppt", "txt", "pdf", "c"};
-        String[] pict = new String[]{"jpg", "png", "gif", "jpeg", "bmp"};
+        String[] pict = new String[]{"jpg", "png", "gif", "jpeg", "bmp", "JPG"};
         String[] video = new String[]{"avi", "mov", "mp4", "wmv", "mkv", "flv"};
         String[] music = new String[]{"wav", "mp3", "wma", "aac", "flac", "ram", "m4a"};
         String[] other = new String[]{
@@ -175,8 +175,10 @@ public class SortServiceImpl implements SortService {
                 length += Long.valueOf(list.get(i).get("length").toString());
             }
             String size = globalFunction.getFileSize(length);
-//                String username = globalFunction.getUsername();
-            String username = "lww";
+            /*** 测试时要修改username ***/
+            String username = globalFunction.getUsername();
+//            String username = "lww";
+
             UserStore userStore = userStoreRepository.findByUsername(username);
             String availableCapacity = userStore.getAvailableCapacity();
 
