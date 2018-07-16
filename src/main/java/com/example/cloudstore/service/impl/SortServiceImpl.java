@@ -148,6 +148,7 @@ public class SortServiceImpl implements SortService {
     public List<Map<String, Object>> SortCapacity() throws IOException, URISyntaxException {
         GlobalFunction globalFunction = new GlobalFunction();
 
+        long totalLength = 0;
         List<Map<String, Object>> returnList = new ArrayList<>();
         for (int flag = 1; flag <= 5; flag++) {
             Map<String, Object> map = new HashMap<>();
@@ -174,6 +175,7 @@ public class SortServiceImpl implements SortService {
             for (int i = 0; i < list.size(); i++) {
                 length += Long.valueOf(list.get(i).get("length").toString());
             }
+            totalLength += length;
             String size = globalFunction.getFileSize(length);
             /*** 测试时要修改username ***/
             String username = globalFunction.getUsername();
@@ -188,16 +190,37 @@ public class SortServiceImpl implements SortService {
             float num2 = numOnly;
             NumberFormat numberFormat = NumberFormat.getInstance();
             numberFormat.setMaximumFractionDigits(2); //保留两位小数
-            String scale = numberFormat.format(num1 / (num2 * 1024 * 1024 * 1024));
+            float scale = Float.valueOf(numberFormat.format(num1 / (num2 * 1024 * 1024 * 1024)));
 
             //添加数据，生成map
             map.put("length", length);
             map.put("size", size);
-            map.put("avaliableCapacity", availableCapacity);
+            map.put("availableCapacity", availableCapacity);
             map.put("scale", scale);
 
             returnList.add(map);
         }
+        String totalSize = globalFunction.getFileSize(totalLength);
+
+        String username = globalFunction.getUsername();
+//            String username = "lww";
+        UserStore userStore = userStoreRepository.findByUsername(username);
+        String availableCapacity = userStore.getAvailableCapacity();
+
+        //计算已用空间的百分比
+        float numOnly = Float.valueOf(StringUtils.substringBefore(availableCapacity, "G"));
+        float num1 = totalLength;
+        float num2 = numOnly;
+        NumberFormat numberFormat = NumberFormat.getInstance();
+        numberFormat.setMaximumFractionDigits(2); //保留两位小数
+        float totalScale = Float.valueOf(numberFormat.format(num1 / (num2 * 1024 * 1024 * 1024)));
+        Map<String, Object> map = new HashMap<>();
+        map.put("totalLength", totalLength);
+        map.put("totalSize", totalSize);
+        map.put("totalScale", totalScale);
+        map.put("availableCapacity", availableCapacity);
+        returnList.add(map);
+
         return returnList;
     }
 }
