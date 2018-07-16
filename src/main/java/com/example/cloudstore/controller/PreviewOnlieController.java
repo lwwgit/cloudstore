@@ -2,10 +2,7 @@ package com.example.cloudstore.controller;
 
 
 import com.example.cloudstore.domain.JsonResult;
-import com.example.cloudstore.utils.ExcelToPdf;
-import com.example.cloudstore.utils.PptToPdf;
-import com.example.cloudstore.utils.TxtToPdf;
-import com.example.cloudstore.utils.WordToPdf;
+import com.example.cloudstore.utils.*;
 import com.itextpdf.text.DocumentException;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
@@ -32,9 +29,12 @@ public class PreviewOnlieController {
 
     @Value("${PC_PATH}")
     private String PC_PATH;
-    
-     private String localName ="E:\\IDEA_FILE\\zhuoyun\\cloudstore\\src\\main\\java\\com\\example\\cloudstore\\temp\\";
-     private String outputName = "E:\\IDEA_FILE\\zhuoyun\\cloudstore\\src\\main\\java\\com\\example\\cloudstore\\temp\\";
+
+    @Value("${TM_PATH}")
+    private String localName;
+
+    @Value("${TM_PATH}")
+    private String outputName;
 
     @PostMapping("/file2Pdf")
     public JsonResult file2Pdf(@RequestParam String input) throws  URISyntaxException,DocumentException{
@@ -55,8 +55,14 @@ public class PreviewOnlieController {
         if (extension.equals("c")|| extension.equals("java")|| extension.equals("txt")|| extension.equals("py")||extension.equals("cpp")){
             return jc2Pdf(input);
         }
+        if (extension.equals("pdf")){
+            return pdf2Pdf(input);
+        }
+        if (extension.equals("jpg")|| extension.equals("png")|| extension.equals("gif")|| extension.equals("bmp")){
+            return Img2Pdf(input);
+        }
         jsonResult.setStatus("转换失败");
-        jsonResult.setResult("格式无法转换");
+        jsonResult.setResult("暂时不支持此格式");
         return jsonResult;
     }
 
@@ -204,6 +210,74 @@ public class PreviewOnlieController {
                 file1.delete();//删除文件
                 result.setStatus("预览成功");
                 result.setResult(PC_PATH + "/upload/"+time+".pdf");
+                HDFS_IN.close();
+                OutToLOCAL.close();
+            }
+        }catch (IOException e){
+            e.printStackTrace();
+            result.setResult(e.getMessage());
+            result.setStatus("下载失败！");
+        }
+        return result;
+    }
+
+    public JsonResult Img2Pdf(@RequestParam String input) throws URISyntaxException,DocumentException {
+        Configuration conf = new Configuration();
+        URI uri = new URI("hdfs://192.168.150.134:9000/");
+        FileSystem fileSystem;
+        JsonResult result = new JsonResult();
+        try{
+            fileSystem = FileSystem.get(uri, conf);
+            Path inputPath = new Path(input);
+            if (!fileSystem.exists(inputPath)) {
+                result.setStatus("该文件不存在");
+            }else {
+                OutputStream OutToLOCAL = new FileOutputStream(localName + input.substring(input.lastIndexOf("/") + 1));
+                FSDataInputStream HDFS_IN = fileSystem.open(inputPath);
+                IOUtils.copyBytes(HDFS_IN, OutToLOCAL, 1024, true);
+
+                String fileName = input.substring(input.lastIndexOf("/") + 1);
+                String fileSuffix = fileName.substring(fileName.lastIndexOf(".")+1);
+                System.out.println(fileSuffix);
+
+                Date date = new Date();
+                Long time = date.getTime();
+                String localNamePath = localName + input.substring(input.lastIndexOf("/") + 1);
+                Img2Pdf.run(localNamePath, outputName + time + ".pdf");
+                File file = new File(localNamePath);
+                file.delete();//删除文件
+                result.setStatus("转换成功");
+                result.setResult(PC_PATH + "/upload/" + time+".pdf");
+                HDFS_IN.close();
+                OutToLOCAL.close();
+            }
+        }catch (IOException e){
+            e.printStackTrace();
+            result.setResult(e.getMessage());
+            result.setStatus("下载失败！");
+        }
+        return result;
+    }
+
+    public JsonResult pdf2Pdf(@RequestParam String input) throws URISyntaxException {
+        Date date = new Date();
+        Long time = date.getTime();
+        JsonResult result = new JsonResult();
+        Configuration conf = new Configuration();
+        URI uri = new URI(HDFS_PATH);
+        FileSystem fileSystem;
+        try{
+            fileSystem = FileSystem.get(uri, conf);
+            Path inputPath = new Path(input);
+            if (!fileSystem.exists(inputPath)) {
+                result.setStatus("文件不存在");
+            }else {
+                FSDataInputStream HDFS_IN = fileSystem.open(inputPath);
+                String fileName = time+".pdf";
+                OutputStream OutToLOCAL = new FileOutputStream(localName + fileName);
+                IOUtils.copyBytes(HDFS_IN, OutToLOCAL, 1024, true);
+                result.setStatus("预览成功");
+                result.setResult(PC_PATH+"/upload/" + fileName);
                 HDFS_IN.close();
                 OutToLOCAL.close();
             }

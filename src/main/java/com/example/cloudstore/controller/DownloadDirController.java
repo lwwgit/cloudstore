@@ -17,11 +17,11 @@ import java.net.URISyntaxException;
 
 @RestController
 public class DownloadDirController {
-
-    private String dataLocalName = "E:\\IDEA_FILE\\zhuoyun\\cloudstore\\src\\main\\java\\com\\example\\cloudstore\\data\\";
+    @Value("${DA_PATH}")
+    private String dataLocalName;
 
     @GetMapping("/downloadFolder")
-    public String downloadFile(HttpServletResponse response,@RequestParam String srcName) throws URISyntaxException, Exception {
+    public String downloadFile(HttpServletResponse response,@RequestParam String srcName) throws  Exception {
         System.out.println(srcName);
         String fileName = srcName.substring(srcName.lastIndexOf("/") + 1); //fileName = file
         String userFatherFileName = srcName.split("/")[1];  //userFatherFilename = user
@@ -69,7 +69,7 @@ public class DownloadDirController {
         String[] srcnames = paths.split(",");
         /*创建个人临时文件夹*/
         String fileName = "batch";
-        String userFatherFileName = srcnames[0].split("/")[1];
+        String userFatherFileName = srcnames[0].split("/")[1]; // /user/file/a.pdf
         String localFileName = dataLocalName + userFatherFileName + "\\" + fileName;
         File dstDir = new File(localFileName);
         if (!dstDir.exists()) {
@@ -129,9 +129,7 @@ public class DownloadDirController {
     }
 
 
-
-
-    public static boolean deleteFile(File dirFile) {
+    public boolean deleteFile(File dirFile) {
         // 如果dir对应的文件不存在，则退出
         if (!dirFile.exists()) {
             return false;
