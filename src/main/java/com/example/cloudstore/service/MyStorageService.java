@@ -4,6 +4,7 @@ package com.example.cloudstore.service;
 
 import com.example.cloudstore.domain.MultipartFileParam;
 
+import java.io.File;
 import java.io.IOException;
 
 /**
@@ -38,4 +39,7 @@ public interface MyStorageService {
      * @throws IOException
      */
     void uploadFileByMappedByteBuffer(MultipartFileParam param) throws Exception;
+
+    boolean deleteFile(String sPath);
+    boolean deleteDirectory(String sPath);
 }

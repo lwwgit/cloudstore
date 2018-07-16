@@ -25,7 +25,7 @@ public class DownloadController {
     @Value("${HDFS_PATH}")
     private String HDFS_PATH;
     
-    private String dataLocalName ="E:\\IDEA_FILE\\zhuoyun\\cloudstore\\src\\main\\java\\com\\example\\cloudstore\\data\\";
+    private String dataLocalName ="D:\\IDEA\\project\\cloudstore\\src\\main\\java\\com\\example\\cloudstore\\data\\";
 
     @GetMapping("/download")
     public String downloadFile(HttpServletResponse response, String srcName) throws  URISyntaxException,UnsupportedEncodingException{

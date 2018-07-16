@@ -17,7 +17,7 @@ public class MyWebAppConfigurer extends WebMvcConfigurerAdapter {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/upload/**").addResourceLocations("file:E:/IDEA_FILE/zhuoyun/cloudstore/src/main/java/com/example/cloudstore/temp/");
+        registry.addResourceHandler("/upload/**").addResourceLocations("file:D:/IDEA/project/cloudstore/src/main/java/com/example/cloudstore/temp/");
     }
 /*
     @Override

@@ -54,7 +54,7 @@ public class HDFS_Downloader
     public static void download(String srcPath, String dstPath) throws Exception
     {
         Configuration conf = new Configuration();
-        URI uri = new URI("hdfs://192.168.150.134:9000/");
+        URI uri = new URI("hdfs://192.168.163.130:9000/");
         hdfs = FileSystem.get(uri, conf);
         if (hdfs.isFile(new Path(srcPath)))
         {

@@ -33,8 +33,8 @@ public class PreviewOnlieController {
     @Value("${PC_PATH}")
     private String PC_PATH;
     
-     private String localName ="E:\\IDEA_FILE\\zhuoyun\\cloudstore\\src\\main\\java\\com\\example\\cloudstore\\temp\\";
-     private String outputName = "E:\\IDEA_FILE\\zhuoyun\\cloudstore\\src\\main\\java\\com\\example\\cloudstore\\temp\\";
+     private String localName ="D:\\IDEA\\project\\cloudstore\\src\\main\\java\\com\\example\\cloudstore\\temp\\";
+     private String outputName = "D:\\IDEA\\project\\cloudstore\\src\\main\\java\\com\\example\\cloudstore\\temp\\";
 
     @PostMapping("/file2Pdf")
     public JsonResult file2Pdf(@RequestParam String input) throws  URISyntaxException,DocumentException{

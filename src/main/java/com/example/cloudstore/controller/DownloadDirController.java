@@ -18,7 +18,7 @@ import java.net.URISyntaxException;
 @RestController
 public class DownloadDirController {
 
-    private String dataLocalName = "E:\\IDEA_FILE\\zhuoyun\\cloudstore\\src\\main\\java\\com\\example\\cloudstore\\data\\";
+    private String dataLocalName = "D:\\IDEA\\project\\cloudstore\\src\\main\\java\\com\\example\\cloudstore\\data\\";
 
     @GetMapping("/downloadFolder")
     public String downloadFile(HttpServletResponse response,@RequestParam String srcName) throws URISyntaxException, Exception {

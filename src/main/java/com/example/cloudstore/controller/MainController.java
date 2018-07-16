@@ -31,7 +31,7 @@ public class MainController {
 	private String HDFS_PATH;
 	
 	
-	private String dataLocalName ="E:\\IDEA_FILE\\zhuoyun\\cloudstore\\src\\main\\java\\com\\example\\cloudstore\\data\\";
+	private String dataLocalName ="D:\\IDEA\\project\\cloudstore\\src\\main\\java\\com\\example\\cloudstore\\data\\";
 
 	//上传文件(TODO)
 	@ApiOperation(value = "上传文件到Hadoop文件系统", notes = "上传文件的文件名")

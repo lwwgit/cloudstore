@@ -15,8 +15,9 @@ public enum ResultStatus {
 
     NO_HAVE(101, "该文件没有上传过。"),
 
-    ING_HAVE(102, "该文件上传了一部分。");
+    ING_HAVE(102, "该文件上传了一部分。"),
 
+    IS_ERROR(103,"发生错误");
 
     private final int value;
 
