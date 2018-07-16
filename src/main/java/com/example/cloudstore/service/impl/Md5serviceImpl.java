@@ -48,4 +48,10 @@ public class Md5serviceImpl implements Md5service {
         return byFileMd5;
     }
 
+    @Override
+    public int deleteByPathAndFileName(String path, String filename) {
+        int i = md5Repository.deleteByPathAndFileName(path, filename);
+        return i;
+    }
+
 }
