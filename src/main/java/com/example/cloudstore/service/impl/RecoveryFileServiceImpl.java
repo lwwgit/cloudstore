@@ -31,6 +31,7 @@ public class RecoveryFileServiceImpl implements RecoveryFileService {
     public boolean MoveToRecovery(String oriPath,String dstPath) throws IOException{
         FileSystem fs = globalFunction.getHadoopFileSystem();
 
+
         boolean b = false;
         Path oldPath = new Path(oriPath);
         Path newPath = new Path(dstPath);

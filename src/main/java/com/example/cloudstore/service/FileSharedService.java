@@ -1,13 +1,16 @@
 package com.example.cloudstore.service;
 
-import com.example.cloudstore.domain.entity.FileShared;
-
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Map;
 
 public interface FileSharedService {
-    String CreateSharedLink(String[] paths) throws URISyntaxException, IOException;
+    Map<String, Object> CreateSharedLink(String[] paths, String ifPasswd) throws URISyntaxException, IOException;
 
-    List<FileShared> ToShared(String id);
+    String ShareVerify(String id);
+
+    List<Map<String, Object>> ToShare(String id, String passwd);
+
+    String RemoveShare(String id, String path);
 }

@@ -15,4 +15,6 @@ public interface SortService {
                   String[] doc, String[] pict, String[] video,
                   String[] music, String[] other) throws IOException;
 
+    List<Map<String, Object>> SortCapacity() throws IOException, URISyntaxException;
+
 }

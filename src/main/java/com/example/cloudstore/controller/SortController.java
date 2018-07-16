@@ -28,8 +28,15 @@ public class SortController {
 
     }
 
+    @PostMapping("/sort/capacity")
+    public Result SortCapacity() throws IOException, URISyntaxException {
+        return ResultUtil.success(sortService.SortCapacity());
+    }
+
     @PostMapping("/search/file")
     public Result SearchFile(@RequestParam("searchWord") String SearchWord) throws IOException, URISyntaxException {
         return ResultUtil.success(searchService.SearchFile(SearchWord));
     }
+
+
 }

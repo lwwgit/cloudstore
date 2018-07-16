@@ -1,20 +1,24 @@
 package com.example.cloudstore.controller;
 
 import com.example.cloudstore.service.SortService;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import sun.misc.BASE64Encoder;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,24 +29,29 @@ public class ImageController {
 
     @Autowired
     private SortService sortService;
+
+    @Value("${HDFS_PATH}")
+    private String HADOOP_URL;
+
     /**
      * 点击图片预览
      * @param imagePath
      * @param response
      * @throws IOException
      */
-    @GetMapping("/usr/image/preview")
+    @GetMapping("/usr/img/preview")
     public void imagePreview(String imagePath,HttpServletResponse response) throws IOException {
 
+        String filename=HADOOP_URL+imagePath;
         //获取文件系统
         FileSystem fs = globalFunction.getHadoopFileSystem();
 
         //获取路径
-        Path p = new Path(imagePath);
+        Path p = new Path(filename);
         //通过文件系统打开路径获取HDFS文件输入流
         FSDataInputStream fis =  fs.open(p);
         //创建缓冲区
-        byte[] buf = new byte[1024*1024];
+        byte[] buf = new byte[fis.available()];
         int len = -1;
         //当当读取的长度不等于-1的时候开始写入
         //写入需要字节输出流
@@ -58,48 +67,95 @@ public class ImageController {
 
     /**
      * 获取图片列表
-     * [{path : /lww/test1.jpg, base64:124wefrdnzsbfgvjm },
-     *  {path : /lww/test2.jpg, base64:124wefrdnzsbfgvjm}]
      * @return
      * @throws IOException
      * @throws URISyntaxException
      */
-    @GetMapping("/usr/image/line")
+    @GetMapping("/usr/img/line")
     public List<Map<String,Object>> SortFile() throws IOException, URISyntaxException {
 
+        FileSystem fs = globalFunction.getHadoopFileSystem();
         // 读取图片字节数组
         List<Map<String, Object>> dataList = new ArrayList<>();
 
-
         List<Map<String,Object>> list = sortService.SortFile(2);
-        List<String> paths = new ArrayList<>();
         //取出path所有值
-        for(int i = 0;i < list.size();i++)
-        {
+        for(int i = 0;i < list.size();i++) {
             Map<String,Object> map = list.get(i);
-            String imagePath = map.get("Path").toString();
-            paths.add(imagePath);
-        }
-        FileSystem fs = globalFunction.getHadoopFileSystem();
-        for (int i = 0; i < paths.size();i++) {
-
-            Map<String, Object> mapList = new HashMap<>();
+            String imgPath = map.get("path").toString();
             //获取路径
-            Path p = new Path(paths.get(i));
+            Path p = new Path(HADOOP_URL + imgPath);
             //通过文件系统打开路径获取HDFS文件输入流
             FSDataInputStream in = fs.open(p);
-
             byte[] data = new byte[in.available()];
             in.read(data);
             in.close();
-            mapList.put("path",paths.get(i));
-//            System.out.println(paths.get(i));
             // 对字节数组Base64编码
             BASE64Encoder encoder = new BASE64Encoder();
-            mapList.put("base64",encoder.encode(data));
-            dataList.add(mapList);
+            map.put("base64",encoder.encode(data));
+            dataList.add(map);
         }
         return dataList;
+    }
 
+
+    /**
+     * 预览音频和视频
+     * @param fpath
+     * @param req
+     * @param resp
+     * @throws IOException
+     */
+    @GetMapping("/get/stream")
+    public void preview(String fpath, HttpServletRequest req, HttpServletResponse resp) throws IOException{
+
+        if(fpath==null)
+            return;
+        String filename=HADOOP_URL+fpath;
+        Configuration config=new Configuration();
+        FileSystem fs = null;
+        FSDataInputStream in=null;
+        try {
+            fs = FileSystem.get(URI.create(filename),config);
+            in=fs.open(new Path(filename));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        final long fileLen = fs.getFileStatus(new Path(filename)).getLen();
+        String range=req.getHeader("Range");
+        resp.setHeader("Content-type","video/mp3");
+        OutputStream out=resp.getOutputStream();
+        if(range==null)
+        {
+            filename=fpath.substring(fpath.lastIndexOf("/")+1);
+            resp.setHeader("Content-Disposition", "attachment; filename="+filename);
+            resp.setContentType("application/octet-stream");
+            resp.setContentLength((int)fileLen);
+            IOUtils.copyBytes(in, out, fileLen, false);
+        }
+        else
+        {
+            long start=Integer.valueOf(range.substring(range.indexOf("=")+1, range.indexOf("-")));
+            long count=fileLen-start;
+            long end;
+            if(range.endsWith("-"))
+                end=fileLen-1;
+            else
+                end=Integer.valueOf(range.substring(range.indexOf("-")+1));
+            String ContentRange="bytes "+String.valueOf(start)+"-"+end+"/"+String.valueOf(fileLen);
+            resp.setStatus(206);
+            resp.setContentType("video/mpeg3");
+            resp.setHeader("Content-Range",ContentRange);
+            in.seek(start);
+            try{
+                IOUtils.copyBytes(in, out, count, false);
+            }
+            catch(Exception e)
+            {
+                throw e;
+            }
+        }
+        in.close();
+        out.close();
     }
 }

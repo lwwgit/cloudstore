@@ -45,10 +45,12 @@ public class MyAuthenticationSuccessHandler implements AuthenticationSuccessHand
         String username = ((User) authentication.getPrincipal()).getUsername();
         SysUser sysUser = sysUserService.selectByName(username);
         String tel = sysUser.getTel();
+        Integer state = sysUser.getState();
+        Integer com = sysUser.getCom();
         Collection<GrantedAuthority> role = ((User) authentication.getPrincipal()).getAuthorities();
         response.setCharacterEncoding("UTF-8");
         response.setContentType("application/json");
-        response.getWriter().println("{\"code\":0,\"msg\":\"登录成功\",\"Token\":\""+ token + "\",\"username\":\""+ username + "\",\"role\":\""+ role + "\",\"tel\":\""+ tel + "\"}");
+        response.getWriter().println("{\"code\":0,\"msg\":\"登录成功\",\"Token\":\""+ token + "\",\"username\":\""+ username + "\",\"role\":\""+ role + "\",\"tel\":\""+ tel + "\",\"state\":\""+ state + "\",\"com\":\""+ com + "\"}");
     }
 
 

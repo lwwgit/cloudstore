@@ -26,6 +26,14 @@ public class RecoveryFile {
 
     private String type;
 
+    private String fileName;
+
+    private String size;
+
+    private Long len;
+
+    private String delTime;
+
     public Long getRecoveryId() {
         return recoveryId;
     }
@@ -64,5 +72,38 @@ public class RecoveryFile {
 
     public void setPresentPath(String presentPath) {
         this.presentPath = presentPath;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+
+    public String getDelTime() {
+        return delTime;
+    }
+
+    public void setDelTime(String delTime) {
+        this.delTime = delTime;
+    }
+
+    public Long getLen() {
+        return len;
+    }
+
+    public void setLen(Long len) {
+        this.len = len;
+    }
+
+    public String getSize() {
+        return size;
+    }
+
+    public void setSize(String size) {
+        this.size = size;
     }
 }
