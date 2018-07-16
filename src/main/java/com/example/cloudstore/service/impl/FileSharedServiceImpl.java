@@ -2,7 +2,9 @@ package com.example.cloudstore.service.impl;
 
 import com.example.cloudstore.controller.GlobalFunction;
 import com.example.cloudstore.domain.entity.FileShared;
+import com.example.cloudstore.domain.entity.ShareDetails;
 import com.example.cloudstore.repository.FileSharedRepository;
+import com.example.cloudstore.repository.ShareDetailsRepository;
 import com.example.cloudstore.service.FileSharedService;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
@@ -15,10 +17,8 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Service
 public class FileSharedServiceImpl implements FileSharedService {
@@ -30,10 +30,19 @@ public class FileSharedServiceImpl implements FileSharedService {
     @Autowired
     FileSharedRepository fileSharedRepository;
 
+    @Autowired
+    ShareDetailsRepository shareDetailsRepository;
+
     @Override
     public Map<String, Object> CreateSharedLink(String[] paths, String ifPasswd) throws URISyntaxException, IOException {
 
         GlobalFunction globalFunction = new GlobalFunction();
+
+        /**** 连接文件系统 *****/
+        FileSystem hdfs = null;
+        Configuration config = new Configuration();
+        config.set("fs.default.name", HdfsPath);
+        hdfs = FileSystem.get(new URI(HdfsPath), config);
 
         /*** 生成id ***/
         String KeyString = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -43,6 +52,27 @@ public class FileSharedServiceImpl implements FileSharedService {
             sb.append(KeyString.charAt((int) Math.round(Math.random() * (len - 1))));
         }
         String returnUrl = "http://localhost:8080/home/share?id=" + sb.toString();
+
+        //获得第一个分享文件的属性
+        Path path0 = new Path(paths[0]);
+        FileStatus file0 = hdfs.getFileStatus(path0);
+        ShareDetails shareDetails = new ShareDetails();
+        shareDetails.setCharId(sb.toString());
+        /*** 测试的时候要更换name ****/
+        shareDetails.setUsername(globalFunction.getUsername());
+//        shareDetails.setUsername("lww");
+
+        //判断分享的文件数量，确定分享文件名和类型
+        int number = paths.length;
+        shareDetails.setFileNum(number);
+        if (number == 1) {
+            shareDetails.setShareName(file0.getPath().getName());
+            shareDetails.setType(file0.getPath().getName().substring(file0.getPath().getName().lastIndexOf(".") + 1));
+        }
+        if (number > 1) {
+            shareDetails.setShareName(file0.getPath().getName() + "等");
+            shareDetails.setType("folder");
+        }
 
         /**** 判断是否需要分享密码并生成密码 ***/
         String passwd = "-1";
@@ -55,15 +85,12 @@ public class FileSharedServiceImpl implements FileSharedService {
             }
             passwd = str.toString();
         }
-
-        /**** 连接文件系统 *****/
-        FileSystem hdfs = null;
-        Configuration config = new Configuration();
-        config.set("fs.default.name", HdfsPath);
-        hdfs = FileSystem.get(new URI(HdfsPath), config);
+        //shareDetails存入分享密码
+        shareDetails.setPasswd(passwd);
+        shareDetails.setIfPasswd(ifPasswd);
+        shareDetailsRepository.save(shareDetails);
 
         for (String path : paths) {
-            System.out.println("啦啦啦啦：" + path);
             Path newpath = new Path(path);
             FileStatus file = hdfs.getFileStatus(newpath);//获得单个文件的属性
 
@@ -91,6 +118,10 @@ public class FileSharedServiceImpl implements FileSharedService {
             fileShared.setIfPasswd(ifPasswd);
             fileShared.setPasswd(passwd);
 
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String nowTime = formatter.format(new Date());
+
+            fileShared.setTime(nowTime);
 
             fileSharedRepository.save(fileShared);
         }
@@ -104,8 +135,13 @@ public class FileSharedServiceImpl implements FileSharedService {
 
     @Override
     public String ShareVerify(String id) {
-        List<FileShared> list = fileSharedRepository.findAllByCharId(id);
-        return list.get(0).getIfPasswd();
+        ShareDetails shareDetails = shareDetailsRepository.findByCharId(id);
+        return shareDetails.getIfPasswd();
+    }
+
+    @Override
+    public List<ShareDetails> AllShare() {
+        return shareDetailsRepository.findAll();
     }
 
     @Override
@@ -131,10 +167,12 @@ public class FileSharedServiceImpl implements FileSharedService {
     }
 
     @Override
-    public String RemoveShare(String id, String path) {
+    public String RemoveShare(String id) {
 
-        fileSharedRepository.deleteByCharIdAndPath(id, path);
-        if (fileSharedRepository.findByCharIdAndPath(id, path) == null) {
+        fileSharedRepository.deleteAllByCharId(id);
+        shareDetailsRepository.deleteByCharId(id);
+
+        if (fileSharedRepository.findByCharId(id) == null && shareDetailsRepository.findByCharId(id) == null) {
             return "success";
         } else {
             return "fail";

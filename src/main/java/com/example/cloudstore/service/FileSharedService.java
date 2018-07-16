@@ -1,5 +1,7 @@
 package com.example.cloudstore.service;
 
+import com.example.cloudstore.domain.entity.ShareDetails;
+
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -10,7 +12,9 @@ public interface FileSharedService {
 
     String ShareVerify(String id);
 
+    List<ShareDetails> AllShare();
+
     List<Map<String, Object>> ToShare(String id, String passwd);
 
-    String RemoveShare(String id, String path);
+    String RemoveShare(String id);
 }

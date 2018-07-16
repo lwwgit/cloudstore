@@ -24,10 +24,12 @@ public class FileShared {
     private String type;
     /**** 文件路径 ****/
     private String path;
-
+    /**** 是否有密码 ***/
     private String ifPasswd;
-
+    /**** 分享密码 ***/
     private String passwd;
+    /**** 分享生成时间 ****/
+    private String time;
 
     public Integer getId() {
         return id;
@@ -99,5 +101,13 @@ public class FileShared {
 
     public void setPasswd(String passwd) {
         this.passwd = passwd;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
+
+    public String getTime() {
+        return time;
     }
 }

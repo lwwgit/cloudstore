@@ -56,7 +56,7 @@ public class GlobalFunction {
          * 因为宝宝也不知道
          **/
 
-        String HADOOP_URL = "hdfs://192.168.220.135:9000/";
+        String HADOOP_URL = "hdfs://192.168.220.137:9000/";
         FileSystem hdfs = null;
         Configuration config = new Configuration();
         // 程序配置
@@ -108,7 +108,7 @@ public class GlobalFunction {
         String[] txtType = {"txt"};
         String[] xlsType = {"xls", "xlsx"};
         String[] codeType = {"c", "java", "h", "html", "css", "php", "jsp", "cpp", "md","py"};
-        String[] imgType = {"jpg", "png", "gif", "jpeg", "bmp"};
+        String[] imgType = {"jpg", "png", "gif", "jpeg", "bmp", "JPG"};
         String[] musicType = {"wav", "mp3", "wma", "aac", "flac", "ram", "m4a"};
         String[] videoType = {"avi", "mov", "mp4", "wmv", "mkv", "flv"};
         String[] zipType = {"rar", "zip", "gz", "arj", "z"};

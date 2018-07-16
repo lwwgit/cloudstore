@@ -30,17 +30,22 @@ public class FileSharedController {
         return ResultUtil.success(fileSharedService.ShareVerify(id));
     }
 
+    //显示当前用户所有分享
+    @PostMapping("/home/share/all")
+    public Result AllShare() {
+        return ResultUtil.success(fileSharedService.AllShare());
+    }
+
     //根据链接id和passwd，返回链接信息给前端
     @PostMapping("/home/share/goto")
     public Result ToShare(@RequestParam("id") String id,
-                          @RequestParam("passwd") String passwd){
+                          @RequestParam("passwd") String passwd) {
         return ResultUtil.success(fileSharedService.ToShare(id, passwd));
     }
 
     //根据分享文件的路径和链接id，取消分享链接（在数据库中删除）
     @PostMapping("/home/share/remove")
-    public Result removeShare(@RequestParam("id") String id,
-                              @RequestParam("path") String path){
-        return ResultUtil.success(fileSharedService.RemoveShare(id, path));
+    public Result removeShare(@RequestParam("id") String id) {
+        return ResultUtil.success(fileSharedService.RemoveShare(id));
     }
 }
