@@ -25,6 +25,10 @@ public class FileShared {
     /**** 文件路径 ****/
     private String path;
 
+    private String ifPasswd;
+
+    private String passwd;
+
     public Integer getId() {
         return id;
     }
@@ -79,5 +83,21 @@ public class FileShared {
 
     public void setPath(String path) {
         this.path = path;
+    }
+
+    public String getIfPasswd() {
+        return ifPasswd;
+    }
+
+    public void setIfPasswd(String ifPasswd) {
+        this.ifPasswd = ifPasswd;
+    }
+
+    public String getPasswd() {
+        return passwd;
+    }
+
+    public void setPasswd(String passwd) {
+        this.passwd = passwd;
     }
 }

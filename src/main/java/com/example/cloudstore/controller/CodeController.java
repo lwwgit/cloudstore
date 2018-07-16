@@ -77,8 +77,10 @@ public class CodeController {
      */
     @GetMapping("/code/sms/verify")
     public Result checkSmsCode(HttpServletRequest request, String sms){
+        System.out.println("sms" + sms);
         HttpSession session = request.getSession();
         SmsCode smsCode = (SmsCode)session.getAttribute(SESSION_KEY_SMS);
+        System.out.println("smsCode" + smsCode);
         if (smsCode.getCode().equals(sms)){
             return ResultUtil.success();
         }

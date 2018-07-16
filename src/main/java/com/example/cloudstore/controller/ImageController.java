@@ -19,7 +19,6 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -40,7 +39,7 @@ public class ImageController {
      * @param response
      * @throws IOException
      */
-    @GetMapping("/usr/image/preview")
+    @GetMapping("/usr/img/preview")
     public void imagePreview(String imagePath,HttpServletResponse response) throws IOException {
 
         String filename=HADOOP_URL+imagePath;
@@ -52,7 +51,7 @@ public class ImageController {
         //通过文件系统打开路径获取HDFS文件输入流
         FSDataInputStream fis =  fs.open(p);
         //创建缓冲区
-        byte[] buf = new byte[1024*1024];
+        byte[] buf = new byte[fis.available()];
         int len = -1;
         //当当读取的长度不等于-1的时候开始写入
         //写入需要字节输出流
@@ -68,46 +67,33 @@ public class ImageController {
 
     /**
      * 获取图片列表
-     * [{path : /lww/test1.jpg, base64:124wefrdnzsbfgvjm },
-     *  {path : /lww/test2.jpg, base64:124wefrdnzsbfgvjm}]
      * @return
      * @throws IOException
      * @throws URISyntaxException
      */
-    @GetMapping("/usr/image/line")
+    @GetMapping("/usr/img/line")
     public List<Map<String,Object>> SortFile() throws IOException, URISyntaxException {
 
+        FileSystem fs = globalFunction.getHadoopFileSystem();
         // 读取图片字节数组
         List<Map<String, Object>> dataList = new ArrayList<>();
 
-
         List<Map<String,Object>> list = sortService.SortFile(2);
-        List<String> paths = new ArrayList<>();
         //取出path所有值
-        for(int i = 0;i < list.size();i++)
-        {
+        for(int i = 0;i < list.size();i++) {
             Map<String,Object> map = list.get(i);
-            String imagePath = map.get("Path").toString();
-            paths.add(imagePath);
-        }
-        FileSystem fs = globalFunction.getHadoopFileSystem();
-        for (int i = 0; i < paths.size();i++) {
-
-            Map<String, Object> mapList = new HashMap<>();
+            String imgPath = map.get("path").toString();
             //获取路径
-            Path p = new Path(paths.get(i));
+            Path p = new Path(HADOOP_URL + imgPath);
             //通过文件系统打开路径获取HDFS文件输入流
             FSDataInputStream in = fs.open(p);
-
             byte[] data = new byte[in.available()];
             in.read(data);
             in.close();
-            mapList.put("path",paths.get(i));
-//            System.out.println(paths.get(i));
             // 对字节数组Base64编码
             BASE64Encoder encoder = new BASE64Encoder();
-            mapList.put("base64",encoder.encode(data));
-            dataList.add(mapList);
+            map.put("base64",encoder.encode(data));
+            dataList.add(map);
         }
         return dataList;
     }

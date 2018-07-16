@@ -56,11 +56,9 @@ public class IconServiceImpl implements IconService {
         fs.copyFromLocalFile(false,srcPath, dstPath);
 
         //打印文件路径
-        FileStatus [] fileStatus = fs.listStatus(dstPath);
-        for (FileStatus file : fileStatus) {
-            System.out.println("上传的文件的路径为："+file.getPath());
-            iconPath =  file.getPath().toString();
-        }
+        FileStatus file = fs.getFileStatus(dstPath);
+        System.out.println("上传的文件的路径为："+file.getPath());
+        iconPath =  file.getPath().toString();
         //关闭文件系统
         fs.close();
         return iconPath;

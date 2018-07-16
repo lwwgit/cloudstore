@@ -24,6 +24,9 @@ public class SysUser {
     /** 用户创建日期. */
     private Date createDate;
 
+    private Integer state;
+
+    private Integer com;
 
     public Integer getId() {
         return id;
@@ -65,14 +68,19 @@ public class SysUser {
         this.createDate = createDate;
     }
 
+    public Integer getState() {
+        return state;
+    }
 
-    @Override
-    public String toString() {
-        return "SysUser{" +
-                "id=" + id +
-                ", tel='" + tel + '\'' +
-                ", username='" + username + '\'' +
-                ", createDate=" + createDate +
-                '}';
+    public void setState(Integer state) {
+        this.state = state;
+    }
+
+    public Integer getCom() {
+        return com;
+    }
+
+    public void setCom(Integer com) {
+        this.com = com;
     }
 }
