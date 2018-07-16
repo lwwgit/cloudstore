@@ -24,14 +24,12 @@ import java.net.URISyntaxException;
 public class DownloadController {
     @Value("${HDFS_PATH}")
     private String HDFS_PATH;
-    
-    private String dataLocalName ="E:\\IDEA_FILE\\zhuoyun\\cloudstore\\src\\main\\java\\com\\example\\cloudstore\\data\\";
+
+    @Value("${DA_PATH}")
+    private String dataLocalName;
 
     @GetMapping("/download")
     public String downloadFile(HttpServletResponse response, String srcName) throws  URISyntaxException,UnsupportedEncodingException{
-        // String fileName = "dalaoyang.jpeg";// 文件名
-      //  String srcName = id ;
-
         String fileName = srcName.substring(srcName.lastIndexOf("/") + 1);
         System.out.println(fileName);
         String userFatherFileName = srcName.split("/")[1];
@@ -39,7 +37,6 @@ public class DownloadController {
 
         if (fileName != null) {
             File file = new File(dataLocalName+userFatherFileName+fileName);
-            //File file = new File(realPath , fileName);
             if (file.exists()) {
                 response.setContentType("application/force-download");// 设置强制下载不打开
                 String File_name = new String(fileName.getBytes(), "ISO-8859-1");
@@ -82,7 +79,6 @@ public class DownloadController {
         return null;
     }
 
-    // 下载HDFS里的文件
     @ApiOperation(value = "下载文件", notes = "文件全路径")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "srcName", value = "下载文件的dfs全路径", required = true, dataType = "String", paramType = "query"),

@@ -5,9 +5,11 @@ import com.example.cloudstore.domain.Constants;
 import com.example.cloudstore.domain.Md5;
 import com.example.cloudstore.domain.MultipartFileParam;
 import com.example.cloudstore.repository.Md5Repository;
+import com.example.cloudstore.service.Md5service;
 import com.example.cloudstore.service.MyStorageService;
 import com.example.cloudstore.utils.FileMD5Util;
 
+import net.bytebuddy.asm.Advice;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -26,6 +28,7 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 /**
  * @Author jitdc
@@ -43,6 +46,8 @@ public class MyStorageServiceImpl implements MyStorageService {
     private StringRedisTemplate stringRedisTemplate;
     @Autowired
     private Md5Repository md5Repository;
+    @Autowired
+    private Md5service md5service;
 
     //这个必须与前端设定的值一致
     @Value("${breakpoint.upload.chunkSize}")
@@ -142,12 +147,23 @@ public class MyStorageServiceImpl implements MyStorageService {
                 System.out.println("重命名成功了！");
             File file = new File(uploadDirPath+"/"+fileName);
             if (file.exists()){
-                Md5 tmp = md5Repository.findByFileMd5AndFileName(param.getMd5(), param.getName());
-                uploadToHdfsService.uploadHdfs(uploadDirPath+"/"+fileName,tmp.getPath());
+                List<Md5> tmps = md5service.findByMd5AndFilename(param.getMd5(), param.getName());
+                if (tmps.size() == 1){
+                    String uploadPath = "";
+                    for (Md5 md5:tmps){
+                        uploadPath = md5.getPath();
+                    }
+                    System.out.println("上传到hdfs上的地址是："+uploadPath);
+                    uploadToHdfsService.uploadHdfs(uploadDirPath+"/"+fileName,uploadPath);
+                }
+                else
+                    System.out.println("该文件可能已上传过了，按规定不应该再上传了 ");
+
             }
 
             else
                 System.out.println("文件出错了！");
+            deleteDirectory(uploadDirPath);
             System.out.println("upload complete !!" + flag + " name=" + fileName);
         }
 
@@ -213,6 +229,62 @@ public class MyStorageServiceImpl implements MyStorageService {
         File newFile = new File(p + File.separatorChar + toFileNewName);
         //修改文件名
         return toBeRenamed.renameTo(newFile);
+    }
+
+
+    /**
+     * 删除目录以及目录下的文件
+     * @param   sPath 被删除目录的路径
+     * @return  目录删除成功返回true，否则返回false
+     */
+    @Override
+    public boolean deleteDirectory(String sPath) {
+        //如果sPath不以文件分隔符结尾，自动添加文件分隔符
+        if (!sPath.endsWith(File.separator)) {
+            sPath = sPath + File.separator;
+        }
+        File dirFile = new File(sPath);
+        //如果dir对应的文件不存在，或者不是一个目录，则退出
+        if (!dirFile.exists() || !dirFile.isDirectory()) {
+            return false;
+        }
+        boolean flag = true;
+        //删除文件夹下的所有文件(包括子目录)
+        File[] files = dirFile.listFiles();
+        for (int i = 0; i < files.length; i++) {
+            //删除子文件
+            if (files[i].isFile()) {
+                flag = deleteFile(files[i].getAbsolutePath());
+                if (!flag) break;
+            } //删除子目录
+            else {
+                flag = deleteDirectory(files[i].getAbsolutePath());
+                if (!flag) break;
+            }
+        }
+        if (!flag) return false;
+        //删除当前目录
+        if (dirFile.delete()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    /**
+     * 删除单个文件
+     * @param   sPath 被删除文件path
+     * @return 删除成功返回true，否则返回false
+     */
+    @Override
+    public boolean deleteFile(String sPath) {
+        boolean flag = false;
+        File file = new File(sPath);
+        // 路径为文件且不为空则进行删除
+        if (file.isFile() && file.exists()) {
+            file.delete();
+            flag = true;
+        }
+        return flag;
     }
 
 }

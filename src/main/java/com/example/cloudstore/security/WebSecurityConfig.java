@@ -80,7 +80,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
                 .authorizeRequests()
                 .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
                 // 如果有允许匿名的url，填在下面
-                .antMatchers("/code/**","/forget/password","/user/check","/register/**","/user/icon/upload","/login.html","/upload/**","/break/**").permitAll()
+                .antMatchers("/code/**","/forget/password","/user/check","/register/**","/swagger-ui.html","/login.html","/upload/**","/break/**","/privateSpace/**").permitAll()
+                .antMatchers("/code/**","/forget/password","/user/check","/register/**","/swagger-ui.html","/login.html","/upload/**","/Admin/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 // 设置登陆页

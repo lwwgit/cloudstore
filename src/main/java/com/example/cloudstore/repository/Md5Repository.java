@@ -12,6 +12,10 @@ import java.util.List;
  */
 public interface Md5Repository extends JpaRepository<Md5,Integer> {
 
-    Md5 findByFileMd5AndFileName(String fileMd5, String fileName);
+    List<Md5> findByFileMd5AndFileName(String fileMd5, String fileName);
+    Md5 findByFileMd5AndPathAndFileName (String fileMd5, String path,String fileName);
+    List<Md5> findByFileMd5AndPath(String fileMd5,String path);
+    List<Md5> findByFileMd5(String fileMd5);
+    int  deleteByPathAndFileName (String path ,String filename);
 
 }
