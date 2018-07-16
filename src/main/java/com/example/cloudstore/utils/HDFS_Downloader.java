@@ -66,6 +66,7 @@ public class HDFS_Downloader
         }
     }
 
+    //测试用的
     public static void main(String[] args)
     {
             try

@@ -8,4 +8,6 @@ import java.util.List;
 public interface SysUserRoleRepository extends JpaRepository<SysUserRole,Integer> {
 
     List<SysUserRole> findByUserId(Integer id);
+
+
 }
