@@ -1,7 +1,9 @@
 package com.example.cloudstore.authentication;
 
 import com.example.cloudstore.domain.entity.SysUser;
+import com.example.cloudstore.domain.entity.UserInfo;
 import com.example.cloudstore.service.SysUserService;
+import com.example.cloudstore.service.UserInfoService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -30,6 +32,8 @@ public class MyAuthenticationSuccessHandler implements AuthenticationSuccessHand
     @Autowired
     private SysUserService sysUserService;
 
+    @Autowired
+    private UserInfoService userInfoService;
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws IOException, ServletException {
@@ -44,13 +48,18 @@ public class MyAuthenticationSuccessHandler implements AuthenticationSuccessHand
 //        response.addHeader("Authentication", token);
         String username = ((User) authentication.getPrincipal()).getUsername();
         SysUser sysUser = sysUserService.selectByName(username);
+        UserInfo userInfo = userInfoService.findByUsername(username);
+        Boolean isVIP = false;
+        if (userInfo.getVip().equals(1)){
+            isVIP = true;
+        }
         String tel = sysUser.getTel();
         Integer state = sysUser.getState();
         Integer com = sysUser.getCom();
         Collection<GrantedAuthority> role = ((User) authentication.getPrincipal()).getAuthorities();
         response.setCharacterEncoding("UTF-8");
         response.setContentType("application/json");
-        response.getWriter().println("{\"code\":0,\"msg\":\"登录成功\",\"Token\":\""+ token + "\",\"username\":\""+ username + "\",\"role\":\""+ role + "\",\"tel\":\""+ tel + "\",\"state\":\""+ state + "\",\"com\":\""+ com + "\"}");
+        response.getWriter().println("{\"code\":0,\"msg\":\"登录成功\",\"Token\":\""+ token + "\",\"username\":\""+ username + "\",\"role\":\""+ role + "\",\"tel\":\""+ tel + "\",\"state\":\""+ state + "\",\"com\":\""+ com + "\",\"isVIP\":\""+ isVIP + "\"}");
     }
 
 
