@@ -6,6 +6,7 @@ import com.example.cloudstore.domain.entity.UserInfo;
 import com.example.cloudstore.service.IconService;
 import com.example.cloudstore.service.SysUserService;
 import com.example.cloudstore.service.UserInfoService;
+import com.example.cloudstore.service.impl.SmsService;
 import com.example.cloudstore.utils.ResultUtil;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 
@@ -35,6 +37,8 @@ public class UserInfoController {
     private GlobalFunction globalFunction;
     @Autowired
     private IconService iconService;
+    @Autowired
+    private SmsService smsService;
 
 
     /**
@@ -67,25 +71,34 @@ public class UserInfoController {
      * 修改手机号
      */
     @PutMapping("/change/tel")
-    public Result  changeTel(String newTel){
+    public Result  changeTel(HttpServletRequest request, String newTel, String sms){
         if(userService.selectByTel(newTel) != null){
             return ResultUtil.error(1,"手机号已被注册");
         }
-        String currentUsername = globalFunction.getUsername();
-        SysUser sysUser = userService.selectByName(currentUsername);
-        sysUser.setTel(newTel);
-        userService.update(sysUser);
-        return ResultUtil.success();
+        boolean result = smsService.checkSmsCode(request,sms);
+        if (result == true) {
+            String currentUsername = globalFunction.getUsername();
+            SysUser sysUser = userService.selectByName(currentUsername);
+            sysUser.setTel(newTel);
+            userService.update(sysUser);
+            return ResultUtil.success();
+        }else {
+            return ResultUtil.error(1,"验证码错误");
+        }
     }
 
     /**
      * 修改个人信息
      */
     @PostMapping("/user/info")
-    public Result userInfo( UserInfo userInfo){
+    public Result userInfo(UserInfo userInfo){
         String currentUsername = globalFunction.getUsername();
-        userInfo.setUsername(currentUsername);
-        userInfoService.update(userInfo);
+        UserInfo info = userInfoService.findByUsername(currentUsername);
+        info.setCity(userInfo.getCity());
+        info.setAge(userInfo.getAge());
+        info.setIntroduction(userInfo.getIntroduction());
+        info.setSex(userInfo.getSex());
+        userInfoService.update(info);
         return ResultUtil.success();
     }
 
@@ -105,13 +118,13 @@ public class UserInfoController {
      * @throws IOException
      */
     @PostMapping("/user/icon/upload")
-    public Result uploadImageFile(MultipartFile file) throws IOException {
-        String username = globalFunction.getUsername();
+    public Result uploadImageFile(String username,MultipartFile file) throws IOException {
+//        String username = globalFunction.getUsername();
+        System.out.println(username);
         String dst = "/userIcon/" + username + ".jpg";
         if (!file.isEmpty()) {
             try {
                 String src = file.getOriginalFilename();
-
                 BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(new File(src)));
                 out.write(file.getBytes());
                 out.flush();
@@ -136,6 +149,7 @@ public class UserInfoController {
                 return ResultUtil.error(1,"上传失败, " + e.getMessage());
             }
 
+
         } else {
             return ResultUtil.error(1,"上传失败,文件为空");
         }
@@ -145,7 +159,7 @@ public class UserInfoController {
     /**
      * 获取头像
      */
-    @GetMapping("/usr/icon/get")
+    @GetMapping("/user/icon/get")
     public void readFileByAPI(HttpServletResponse response) throws IOException {
 //        String iconPath = "hdfs://192.168.59.145:9000/userIcon/lww.jpg";
         String username = globalFunction.getUsername();
