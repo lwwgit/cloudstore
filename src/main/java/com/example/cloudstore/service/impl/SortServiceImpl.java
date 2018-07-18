@@ -1,5 +1,6 @@
 package com.example.cloudstore.service.impl;
 
+import com.aspose.slides.p2cbca448.ong;
 import com.example.cloudstore.controller.GlobalFunction;
 import com.example.cloudstore.domain.entity.UserStore;
 import com.example.cloudstore.repository.UserStoreRepository;
@@ -56,7 +57,7 @@ public class SortServiceImpl implements SortService {
         String[] music = new String[]{"wav", "mp3", "wma", "aac", "flac", "ram", "m4a"};
         String[] other = new String[]{
                 "docx", "doc", "xlsx", "xls", "pptx", "ppt", "txt", "pdf",
-                "jpg", "png", "gif", "jpeg",
+                "jpg", "png", "gif", "jpeg", "JPG",
                 "avi", "mov", "mp4", "wmv", "mkv", "flv",
                 "wav", "mp3", "wma", "aac", "flac"};
 
@@ -146,7 +147,19 @@ public class SortServiceImpl implements SortService {
 
     @Override
     public List<Map<String, Object>> SortCapacity() throws IOException, URISyntaxException {
+
         GlobalFunction globalFunction = new GlobalFunction();
+
+        /*** 测试时要修改username ***/
+            String username = globalFunction.getUsername();
+//        String username = "lww";
+
+        UserStore userStore = userStoreRepository.findByUsername(username);
+        String availableCapacity = userStore.getAvailableCapacity();
+
+        //设置百分比计算时需要保留的小数位
+        NumberFormat numberFormat = NumberFormat.getInstance();
+        numberFormat.setMaximumFractionDigits(2); //保留四位小数
 
         long totalLength = 0;
         List<Map<String, Object>> returnList = new ArrayList<>();
@@ -168,6 +181,7 @@ public class SortServiceImpl implements SortService {
                 map.put("type", "other");
             }
 
+            //根据flag循环遍历不同类型的文件，生成MapList
             List<Map<String, Object>> list = SortFile(flag);
 
             //获取length, size, availableCapacity这些变量
@@ -177,22 +191,13 @@ public class SortServiceImpl implements SortService {
             }
             totalLength += length;
             String size = globalFunction.getFileSize(length);
-            /*** 测试时要修改username ***/
-            String username = globalFunction.getUsername();
-//            String username = "lww";
 
-            UserStore userStore = userStoreRepository.findByUsername(username);
-            String availableCapacity = userStore.getAvailableCapacity();
+            //计算该类文件占所有用户文件容量的百分比
+            long numOnly = Long.valueOf(StringUtils.substringBefore(availableCapacity, "G"));
+            float num1 = (float)length;
+            float scale = Float.valueOf(numberFormat.format(num1 / (numOnly * 1024 * 1024 * 1024)*100));
 
-            //计算已用空间的百分比
-            float numOnly = Float.valueOf(StringUtils.substringBefore(availableCapacity, "G"));
-            float num1 = length;
-            float num2 = numOnly;
-            NumberFormat numberFormat = NumberFormat.getInstance();
-            numberFormat.setMaximumFractionDigits(2); //保留两位小数
-            float scale = Float.valueOf(numberFormat.format(num1 / (num2 * 1024 * 1024 * 1024)));
-
-            //添加数据，生成map
+            //添加数据，生成该类型文件的map，并添加到returnList中
             map.put("length", length);
             map.put("size", size);
             map.put("availableCapacity", availableCapacity);
@@ -200,26 +205,29 @@ public class SortServiceImpl implements SortService {
 
             returnList.add(map);
         }
+
+        //计算和添加所有已用类型的总数据
         String totalSize = globalFunction.getFileSize(totalLength);
 
-        String username = globalFunction.getUsername();
-//            String username = "lww";
-        UserStore userStore = userStoreRepository.findByUsername(username);
-        String availableCapacity = userStore.getAvailableCapacity();
+        Long numOnly = Long.valueOf(StringUtils.substringBefore(availableCapacity, "G"));
+        float num2 =  totalLength;
 
-        //计算已用空间的百分比
-        float numOnly = Float.valueOf(StringUtils.substringBefore(availableCapacity, "G"));
-        float num1 = totalLength;
-        float num2 = numOnly;
-        NumberFormat numberFormat = NumberFormat.getInstance();
-        numberFormat.setMaximumFractionDigits(2); //保留两位小数
-        float totalScale = Float.valueOf(numberFormat.format(num1 / (num2 * 1024 * 1024 * 1024)));
+        Float totalScale = Float.valueOf(numberFormat.format(num2 / (numOnly * 1024 * 1024 * 1024)*100));
         Map<String, Object> map = new HashMap<>();
-        map.put("totalLength", totalLength);
-        map.put("totalSize", totalSize);
-        map.put("totalScale", totalScale);
+        map.put("type", "total");
+        map.put("length", totalLength);
+        map.put("size", totalSize);
+        map.put("scale", totalScale);
         map.put("availableCapacity", availableCapacity);
         returnList.add(map);
+
+        //计算每个类型所占空间占所有已用空间的比例
+        for (int j = 0; j < returnList.size(); j ++){
+
+            float n1 = Long.valueOf(returnList.get(j).get("length").toString());
+            float laterScale = Float.valueOf(numberFormat.format(n1/totalLength*100));
+            returnList.get(j).put("laterScale", laterScale);
+        }
 
         return returnList;
     }
