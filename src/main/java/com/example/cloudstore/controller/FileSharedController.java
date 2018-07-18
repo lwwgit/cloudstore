@@ -21,13 +21,22 @@ public class FileSharedController {
     @PostMapping("/get/shared/link")
     public Result GetSharedLink(@RequestParam("filePath") String[] paths,
                                 @RequestParam("ifPasswd") String ifPasswd) throws IOException, URISyntaxException {
+        System.out.println("打印filePath" + paths + "\n是否密码" + ifPasswd);
         return ResultUtil.success(fileSharedService.CreateSharedLink(paths, ifPasswd));
     }
 
     //验证该链接是否为加密链接，返回yes/no给前端
     @PostMapping("/home/share")
-    public Result ShareVerify(@RequestParam("id") String id) {
-        return ResultUtil.success(fileSharedService.ShareVerify(id));
+    public Result ShareVerify(@RequestParam("id") String id,
+                              @RequestParam("username") String username) {
+        String ifPasswd = fileSharedService.ShareVerify(id, username);
+        if (ifPasswd.equals("yes")){
+            return ResultUtil.success(ifPasswd);
+        }
+        if (ifPasswd.equals("no")){
+            return ResultUtil.success(fileSharedService.ToShare(id, "-1"));
+        }
+        return ResultUtil.error(0, "ifPasswd is not yes/no");
     }
 
     //显示当前用户所有分享
@@ -45,7 +54,7 @@ public class FileSharedController {
 
     //根据分享文件的路径和链接id，取消分享链接（在数据库中删除）
     @PostMapping("/home/share/remove")
-    public Result removeShare(@RequestParam("id") String id) {
+    public Result removeShare(@RequestParam("id") String[] id) {
         return ResultUtil.success(fileSharedService.RemoveShare(id));
     }
 }

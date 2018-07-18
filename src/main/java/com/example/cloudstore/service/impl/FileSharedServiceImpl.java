@@ -3,8 +3,10 @@ package com.example.cloudstore.service.impl;
 import com.example.cloudstore.controller.GlobalFunction;
 import com.example.cloudstore.domain.entity.FileShared;
 import com.example.cloudstore.domain.entity.ShareDetails;
+import com.example.cloudstore.domain.entity.UserInfo;
 import com.example.cloudstore.repository.FileSharedRepository;
 import com.example.cloudstore.repository.ShareDetailsRepository;
+import com.example.cloudstore.repository.UserInfoRepository;
 import com.example.cloudstore.service.FileSharedService;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
@@ -33,6 +35,9 @@ public class FileSharedServiceImpl implements FileSharedService {
     @Autowired
     ShareDetailsRepository shareDetailsRepository;
 
+    @Autowired
+    UserInfoRepository userInfoRepository;
+
     @Override
     public Map<String, Object> CreateSharedLink(String[] paths, String ifPasswd) throws URISyntaxException, IOException {
 
@@ -51,7 +56,6 @@ public class FileSharedServiceImpl implements FileSharedService {
         for (int i = 0; i < 8; i++) {
             sb.append(KeyString.charAt((int) Math.round(Math.random() * (len - 1))));
         }
-        String returnUrl = "http://localhost:8080/home/share?id=" + sb.toString();
 
         //获得第一个分享文件的属性
         Path path0 = new Path(paths[0]);
@@ -67,12 +71,16 @@ public class FileSharedServiceImpl implements FileSharedService {
         shareDetails.setFileNum(number);
         if (number == 1) {
             shareDetails.setShareName(file0.getPath().getName());
-            shareDetails.setType(file0.getPath().getName().substring(file0.getPath().getName().lastIndexOf(".") + 1));
+            String fileType = file0.getPath().getName().substring(file0.getPath().getName().lastIndexOf(".") + 1);
+            shareDetails.setType(globalFunction.getFileType(fileType));
         }
         if (number > 1) {
             shareDetails.setShareName(file0.getPath().getName() + "等");
             shareDetails.setType("folder");
         }
+
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        String nowTime = formatter.format(new Date());
 
         /**** 判断是否需要分享密码并生成密码 ***/
         String passwd = "-1";
@@ -88,6 +96,7 @@ public class FileSharedServiceImpl implements FileSharedService {
         //shareDetails存入分享密码
         shareDetails.setPasswd(passwd);
         shareDetails.setIfPasswd(ifPasswd);
+        shareDetails.setTime(nowTime);
         shareDetailsRepository.save(shareDetails);
 
         for (String path : paths) {
@@ -117,26 +126,27 @@ public class FileSharedServiceImpl implements FileSharedService {
             fileShared.setType(type);
             fileShared.setIfPasswd(ifPasswd);
             fileShared.setPasswd(passwd);
-
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            String nowTime = formatter.format(new Date());
-
             fileShared.setTime(nowTime);
 
             fileSharedRepository.save(fileShared);
         }
 
         Map<String, Object> returnMap = new HashMap<>();
-        returnMap.put("openUrl", returnUrl);
+        returnMap.put("id", sb.toString());
         returnMap.put("passwd", passwd);
 
+        System.out.println("打印returnMap" + returnMap);
         return returnMap;
     }
 
     @Override
-    public String ShareVerify(String id) {
+    public String ShareVerify(String id, String username) {
         ShareDetails shareDetails = shareDetailsRepository.findByCharId(id);
-        return shareDetails.getIfPasswd();
+        String ifPasswd = shareDetails.getIfPasswd();
+        if (shareDetails.getUsername().equals(username)) {
+            ifPasswd = "no";
+        }
+        return ifPasswd;
     }
 
     @Override
@@ -148,7 +158,16 @@ public class FileSharedServiceImpl implements FileSharedService {
     public List<Map<String, Object>> ToShare(String id, String passwd) {
         List<FileShared> list = fileSharedRepository.findAllByCharId(id);
 
+        ShareDetails shareDetails = shareDetailsRepository.findByCharId(id);
+        String name = shareDetails.getUsername();
+        UserInfo userInfo = userInfoRepository.findByUsername(name);
         List<Map<String, Object>> returnList = new ArrayList<>();
+
+        Map<String, Object> userMap = new HashMap<>();
+        userMap.put("username", userInfo.getUsername());
+        userMap.put("icon", userInfo.getIcon());
+        userMap.put("vip", userInfo.getVip());
+        returnList.add(userMap);
 
         for (int i = 0; i < list.size(); i++) {
             Map<String, Object> childList = new HashMap<>();
@@ -157,9 +176,11 @@ public class FileSharedServiceImpl implements FileSharedService {
             childList.put("size", list.get(i).getSize());
             childList.put("type", list.get(i).getType());
             childList.put("path", list.get(i).getPath());
+            childList.put("time", list.get(i).getTime());
             returnList.add(childList);
         }
         if (passwd.equals("-1") || passwd.equals(list.get(0).getPasswd())) {
+            System.out.println("打印returnList" + returnList);
             return returnList;
         } else {
             return null;
@@ -167,12 +188,17 @@ public class FileSharedServiceImpl implements FileSharedService {
     }
 
     @Override
-    public String RemoveShare(String id) {
-
-        fileSharedRepository.deleteAllByCharId(id);
-        shareDetailsRepository.deleteByCharId(id);
-
-        if (fileSharedRepository.findByCharId(id) == null && shareDetailsRepository.findByCharId(id) == null) {
+    public String RemoveShare(String[] strid) {
+        int n = 0;
+        for (String id : strid) {
+            System.out.println("输入的charId" + id);
+            fileSharedRepository.deleteAllByCharId(id);
+            shareDetailsRepository.deleteByCharId(id);
+            if (fileSharedRepository.findByCharId(id) == null && shareDetailsRepository.findByCharId(id) == null) {
+                n++;
+            }
+        }
+        if (n == strid.length) {
             return "success";
         } else {
             return "fail";

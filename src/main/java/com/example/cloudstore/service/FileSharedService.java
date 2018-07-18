@@ -10,11 +10,11 @@ import java.util.Map;
 public interface FileSharedService {
     Map<String, Object> CreateSharedLink(String[] paths, String ifPasswd) throws URISyntaxException, IOException;
 
-    String ShareVerify(String id);
+    String ShareVerify(String id, String username);
 
     List<ShareDetails> AllShare();
 
     List<Map<String, Object>> ToShare(String id, String passwd);
 
-    String RemoveShare(String id);
+    String RemoveShare(String[] id);
 }
