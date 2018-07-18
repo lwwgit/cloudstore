@@ -63,8 +63,8 @@ public class FileSharedServiceImpl implements FileSharedService {
         ShareDetails shareDetails = new ShareDetails();
         shareDetails.setCharId(sb.toString());
         /*** 测试的时候要更换name ****/
-        shareDetails.setUsername(globalFunction.getUsername());
-//        shareDetails.setUsername("lww");
+//        shareDetails.setUsername(globalFunction.getUsername());
+        shareDetails.setUsername("lww");
 
         //判断分享的文件数量，确定分享文件名和类型
         int number = paths.length;
@@ -199,6 +199,22 @@ public class FileSharedServiceImpl implements FileSharedService {
             }
         }
         if (n == strid.length) {
+            return "success";
+        } else {
+            return "fail";
+        }
+    }
+
+    @Override
+    public String Report(String id) {
+        ShareDetails shareDetails = shareDetailsRepository.findByCharId(id);
+        int reportNum = shareDetails.getReport();
+        reportNum = reportNum + 1;
+        shareDetails.setReport(reportNum);
+        shareDetailsRepository.save(shareDetails);
+
+        ShareDetails shareDetailsResult = shareDetailsRepository.findByCharId(id);
+        if (shareDetailsResult.getReport() == reportNum) {
             return "success";
         } else {
             return "fail";

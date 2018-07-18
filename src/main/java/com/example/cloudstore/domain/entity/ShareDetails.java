@@ -28,6 +28,8 @@ public class ShareDetails {
 
     private String time;
 
+    private int report;
+
     public Integer getId() {
         return id;
     }
@@ -98,5 +100,13 @@ public class ShareDetails {
 
     public void setTime(String time) {
         this.time = time;
+    }
+
+    public int getReport() {
+        return report;
+    }
+
+    public void setReport(int report) {
+        this.report = report;
     }
 }

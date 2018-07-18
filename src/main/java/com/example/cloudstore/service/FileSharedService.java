@@ -17,4 +17,6 @@ public interface FileSharedService {
     List<Map<String, Object>> ToShare(String id, String passwd);
 
     String RemoveShare(String[] id);
+
+    String Report(String id);
 }

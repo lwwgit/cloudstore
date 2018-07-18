@@ -57,4 +57,9 @@ public class FileSharedController {
     public Result removeShare(@RequestParam("id") String[] id) {
         return ResultUtil.success(fileSharedService.RemoveShare(id));
     }
+
+    @PostMapping("/home/share/report")
+    public Result report(@RequestParam("id") String id){
+        return ResultUtil.success(fileSharedService.Report(id));
+    }
 }
