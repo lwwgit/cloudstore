@@ -1,17 +1,22 @@
 package com.example.cloudstore.service.impl;
 
 import com.example.cloudstore.domain.JsonResult;
+import com.example.cloudstore.domain.Md5;
 import com.example.cloudstore.domain.entity.Dir;
+import com.example.cloudstore.repository.Md5Repository;
 import com.example.cloudstore.service.MainService;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.xml.bind.SchemaOutputResolver;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -21,6 +26,7 @@ import java.util.Date;
 import java.util.List;
 
 @Service
+@Transactional
 public class MainServiceImpl implements MainService {
 
     @Value("${HDFS_PATH}")
@@ -28,6 +34,8 @@ public class MainServiceImpl implements MainService {
 
     @Value("${DA_PATH}")
     private String dataLocalName;
+    @Autowired
+    private Md5Repository md5Repository;
 
     @Override
     public JsonResult mkdirMulu(String pPath, String fileName) throws URISyntaxException{
@@ -46,6 +54,13 @@ public class MainServiceImpl implements MainService {
             } else {
                 fileSystem.mkdirs(muluPath);
                 result.setStatus("创建成功");
+                Md5 md51 = new Md5();
+                md51.setUid("文件夹");
+                md51.setFileName(fileName);
+                md51.setFileMd5("");
+                md51.setPath(pPath);
+                md51.setCreateTime(new Date());
+                md5Repository.save(md51);
             }
             result.setResult(muluName);
         } catch (IOException e) {
@@ -53,6 +68,7 @@ public class MainServiceImpl implements MainService {
             result.setResult(e.getMessage());
             result.setStatus("创建失败！");
         }
+
         System.out.println(result.getStatus() + ": " + result.getResult());
         return result;
     }
@@ -129,6 +145,7 @@ public class MainServiceImpl implements MainService {
         System.out.println("oldpath:"+oldPath+" "+"newName:"+newName);
         String oldFileName = oldPath.substring(oldPath.lastIndexOf("/")+1);
         String oldFatherName = oldPath.substring(0,oldPath.length()-oldFileName.length());
+        String oldFatherPath = oldPath.substring(0,oldPath.length()-oldFileName.length()-1);
         String newPath = oldFatherName+newName;
 
         JsonResult result = new JsonResult();
@@ -144,6 +161,24 @@ public class MainServiceImpl implements MainService {
             } else{
                 fileSystem.rename(oldHdfsPath,newHdfsPath);
                 result.setStatus("修改成功");
+                //向数据库中存入重命名后的文件信息
+                //判断是不是文件夹
+                Md5 IsDir = md5Repository.findByUidAndPathAndFileName("文件夹",oldFatherPath,oldFileName);
+                if (IsDir != null){
+                    //修改数据库中文件夹的名字
+                    int i = md5Repository.updateDirName(newName,"文件夹",oldFatherPath,oldFileName);
+                    //修改文件夹下所有文件的路径名
+                    List<Md5> byPathLike = md5Repository.findByPathLike(oldPath);//找出所有在该文件夹下的文件
+                    for (Md5 md5:byPathLike){
+                        String newFilePath  = newPath+ md5.getPath().substring(oldPath.length());
+                        md5Repository.updateFilePathInDirNameLike(newFilePath,md5.getPath());
+                    }
+
+                }
+                else {
+                    //修改数据库中对于数据的filename
+                    int i = md5Repository.updateFileName(newName, oldFatherPath, oldFileName);
+                }
             }
             result.setResult(newName.substring(newName.lastIndexOf("/") + 1));
         } catch (IOException e) {
@@ -195,6 +230,7 @@ public class MainServiceImpl implements MainService {
         for (String oldDirPath : oldDirPaths) {
             JsonResult result = new JsonResult();
             String oldname = oldDirPath.substring(oldDirPath.lastIndexOf("/") + 1); // test2
+            String oldFatherPath = oldDirPath.substring(0,oldDirPath.length()-oldname.length()-1);
 			 /*文件的新hdfs全路径*/
             String newDirPath = newFatherPath + "/" + oldname; //   /zlw/test1/test2
 
@@ -217,6 +253,22 @@ public class MainServiceImpl implements MainService {
                     fileSystem.rename(oldHdfsPath, newPath);
                     result.setStatus("移动成功");
                     result.setResult(result.getStatus());
+                    //先判断当前路径是否是文件夹
+                    Md5 IsDir = md5Repository.findByUidAndPathAndFileName("文件夹", oldFatherPath,oldname);
+                    if (IsDir != null){
+                        //是文件夹，修改文件夹的路径
+                        int i = md5Repository.updateDirPath(newFatherPath,"文件夹",oldFatherPath,oldname);
+                        //修改文件夹下所有文件的路径名
+                        List<Md5> byPathLike = md5Repository.findByPathLike(oldDirPath);//找出所有在该文件夹下的文件
+                        for (Md5 md5:byPathLike){
+                            String newFilePath  = newFatherPath+ md5.getPath().substring(oldFatherPath.length());
+                            md5Repository.updateFilePathInDirNameLike(newFilePath,md5.getPath());
+                        }
+
+                    }
+                    else {//是文件，修改该条数据的路径
+                        int i = md5Repository.updateFilePath(newFatherPath, oldFatherPath, oldname);
+                    }
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -224,6 +276,8 @@ public class MainServiceImpl implements MainService {
                 result.setStatus("移动失败！");
             }
             results.add(result);
+
+
         }
         return results;
     }

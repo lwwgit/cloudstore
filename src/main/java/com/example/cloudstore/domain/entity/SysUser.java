@@ -1,5 +1,4 @@
 package com.example.cloudstore.domain.entity;
-
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -48,9 +47,11 @@ public class SysUser {
         return username;
     }
 
+
     public void setUsername(String username) {
         this.username = username == null ? null : username.trim();
     }
+
 
     public String getPassword() {
         return password;
