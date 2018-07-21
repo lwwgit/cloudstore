@@ -1,6 +1,5 @@
 package com.example.cloudstore.service.impl;
 
-import com.aspose.slides.p2cbca448.ong;
 import com.example.cloudstore.controller.GlobalFunction;
 import com.example.cloudstore.domain.entity.UserStore;
 import com.example.cloudstore.repository.UserStoreRepository;
@@ -93,7 +92,7 @@ public class SortServiceImpl implements SortService {
                 list.put("path", truePath);
                 list.put("time", formatter.format(files[i].getModificationTime()));
                 list.put("size", globalFunction.getFileSize(files[i].getLen()));
-                list.put("length", files[i].getLen());
+                list.put("len", files[i].getLen());
                 list.put("type", globalFunction.getFileType(suffix));
 
                 if (flag == 1) {
@@ -151,7 +150,7 @@ public class SortServiceImpl implements SortService {
         GlobalFunction globalFunction = new GlobalFunction();
 
         /*** 测试时要修改username ***/
-            String username = globalFunction.getUsername();
+        String username = globalFunction.getUsername();
 //        String username = "lww";
 
         UserStore userStore = userStoreRepository.findByUsername(username);
@@ -161,7 +160,6 @@ public class SortServiceImpl implements SortService {
         NumberFormat numberFormat = NumberFormat.getInstance();
         numberFormat.setMaximumFractionDigits(2); //保留四位小数
 
-        long totalLength = 0;
         List<Map<String, Object>> returnList = new ArrayList<>();
         for (int flag = 1; flag <= 5; flag++) {
             Map<String, Object> map = new HashMap<>();
@@ -189,13 +187,13 @@ public class SortServiceImpl implements SortService {
             for (int i = 0; i < list.size(); i++) {
                 length += Long.valueOf(list.get(i).get("length").toString());
             }
-            totalLength += length;
+//            totalLength += length;
             String size = globalFunction.getFileSize(length);
 
             //计算该类文件占所有用户文件容量的百分比
             long numOnly = Long.valueOf(StringUtils.substringBefore(availableCapacity, "G"));
-            float num1 = (float)length;
-            float scale = Float.valueOf(numberFormat.format(num1 / (numOnly * 1024 * 1024 * 1024)*100));
+            float num1 = (float) length;
+            float scale = Float.valueOf(numberFormat.format(num1 / (numOnly * 1024 * 1024 * 1024) * 100));
 
             //添加数据，生成该类型文件的map，并添加到returnList中
             map.put("length", length);
@@ -205,14 +203,19 @@ public class SortServiceImpl implements SortService {
 
             returnList.add(map);
         }
-
+        /*****************/
+//        System.out.println("大小返回1： " + globalFunction.getDirectorySize("/" + username));
+        long totalLength = Long.valueOf(globalFunction.getDirectorySize("/" + username));
+//        System.out.println("get totalLength: " + totalLength);
+       /*****************/
         //计算和添加所有已用类型的总数据
+
         String totalSize = globalFunction.getFileSize(totalLength);
 
         Long numOnly = Long.valueOf(StringUtils.substringBefore(availableCapacity, "G"));
-        float num2 =  totalLength;
+        float num2 = totalLength;
 
-        Float totalScale = Float.valueOf(numberFormat.format(num2 / (numOnly * 1024 * 1024 * 1024)*100));
+        Float totalScale = Float.valueOf(numberFormat.format(num2 / (numOnly * 1024 * 1024 * 1024) * 100));
         Map<String, Object> map = new HashMap<>();
         map.put("type", "total");
         map.put("length", totalLength);
@@ -222,13 +225,18 @@ public class SortServiceImpl implements SortService {
         returnList.add(map);
 
         //计算每个类型所占空间占所有已用空间的比例
-        for (int j = 0; j < returnList.size(); j ++){
+        for (int j = 0; j < returnList.size(); j++) {
 
-            float n1 = Long.valueOf(returnList.get(j).get("length").toString());
-            float laterScale = Float.valueOf(numberFormat.format(n1/totalLength*100));
-            returnList.get(j).put("laterScale", laterScale);
+            if (totalLength == 0) {
+                returnList.get(j).put("laterScale", 0);
+            } else {
+                float n1 = Long.valueOf(returnList.get(j).get("length").toString());
+                float laterScale = Float.valueOf(numberFormat.format(n1 / totalLength * 100));
+                returnList.get(j).put("laterScale", laterScale);
+            }
         }
 
         return returnList;
     }
+
 }

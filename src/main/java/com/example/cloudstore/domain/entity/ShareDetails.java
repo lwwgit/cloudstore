@@ -30,6 +30,8 @@ public class ShareDetails {
 
     private int report;
 
+    private String fatherPath;
+
     public Integer getId() {
         return id;
     }
@@ -108,5 +110,13 @@ public class ShareDetails {
 
     public void setReport(int report) {
         this.report = report;
+    }
+
+    public String getFatherPath() {
+        return fatherPath;
+    }
+
+    public void setFatherPath(String fatherPath) {
+        this.fatherPath = fatherPath;
     }
 }

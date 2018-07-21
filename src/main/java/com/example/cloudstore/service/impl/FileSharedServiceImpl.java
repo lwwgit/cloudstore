@@ -1,6 +1,7 @@
 package com.example.cloudstore.service.impl;
 
 import com.example.cloudstore.controller.GlobalFunction;
+import com.example.cloudstore.domain.JsonShare;
 import com.example.cloudstore.domain.entity.FileShared;
 import com.example.cloudstore.domain.entity.ShareDetails;
 import com.example.cloudstore.domain.entity.UserInfo;
@@ -59,12 +60,15 @@ public class FileSharedServiceImpl implements FileSharedService {
 
         //获得第一个分享文件的属性
         Path path0 = new Path(paths[0]);
-        FileStatus file0 = hdfs.getFileStatus(path0);
+        FileStatus file0 = hdfs.getFileLinkStatus(path0);
+        String fp = file0.getPath().getParent().toString();
+        String fatherPath = fp.substring(fp.lastIndexOf("9000") + 4);
         ShareDetails shareDetails = new ShareDetails();
         shareDetails.setCharId(sb.toString());
         /*** 测试的时候要更换name ****/
-//        shareDetails.setUsername(globalFunction.getUsername());
-        shareDetails.setUsername("lww");
+        shareDetails.setUsername(globalFunction.getUsername());
+        shareDetails.setFatherPath(fatherPath);
+//        shareDetails.setUserName("lww");
 
         //判断分享的文件数量，确定分享文件名和类型
         int number = paths.length;
@@ -106,19 +110,22 @@ public class FileSharedServiceImpl implements FileSharedService {
             String name = file.getPath().getName();
             String type = null;
             String size = null;
+            long length = 0;
             if (file.isFile()) {
                 String suffix = name.substring(name.lastIndexOf(".") + 1);
                 type = globalFunction.getFileType(suffix);
                 size = globalFunction.getFileSize(file.getLen());
+                length = file.getLen();
             }
             if (file.isDirectory()) {
                 type = "folder";
                 size = globalFunction.getFileSize(hdfs.getContentSummary(new Path(path)).getLength());
+                length = hdfs.getContentSummary(new Path(path)).getLength();
             }
 
             FileShared fileShared = new FileShared();
             fileShared.setCharId(sb.toString());
-            fileShared.setFilename(name);
+            fileShared.setFileName(name);
             fileShared.setOwner(file.getOwner());
             String savePath = file.getPath().toString().substring(file.getPath().toString().lastIndexOf("9000") + 4);
             fileShared.setPath(savePath);
@@ -127,6 +134,7 @@ public class FileSharedServiceImpl implements FileSharedService {
             fileShared.setIfPasswd(ifPasswd);
             fileShared.setPasswd(passwd);
             fileShared.setTime(nowTime);
+            fileShared.setLength(length);
 
             fileSharedRepository.save(fileShared);
         }
@@ -140,13 +148,20 @@ public class FileSharedServiceImpl implements FileSharedService {
     }
 
     @Override
-    public String ShareVerify(String id, String username) {
+    public Map<String, Object> ShareVerify(String id, String username) {
         ShareDetails shareDetails = shareDetailsRepository.findByCharId(id);
+
+        System.out.println("打印shareDetails: " + shareDetails);
         String ifPasswd = shareDetails.getIfPasswd();
+        String shareUsername = shareDetails.getUsername();
+        System.out.println("打印ifPasswd: " + ifPasswd);
         if (shareDetails.getUsername().equals(username)) {
             ifPasswd = "no";
         }
-        return ifPasswd;
+        Map<String, Object> returnMap = new HashMap<>();
+        returnMap.put("ifPasswd", ifPasswd);
+        returnMap.put("shareUsername", shareUsername);
+        return returnMap;
     }
 
     @Override
@@ -155,33 +170,41 @@ public class FileSharedServiceImpl implements FileSharedService {
     }
 
     @Override
-    public List<Map<String, Object>> ToShare(String id, String passwd) {
+    public JsonShare ToShare(String id, String passwd) {
         List<FileShared> list = fileSharedRepository.findAllByCharId(id);
 
         ShareDetails shareDetails = shareDetailsRepository.findByCharId(id);
+        /***** 测试时修改name *****/
         String name = shareDetails.getUsername();
-        UserInfo userInfo = userInfoRepository.findByUsername(name);
-        List<Map<String, Object>> returnList = new ArrayList<>();
+//        String name = "lww";
 
-        Map<String, Object> userMap = new HashMap<>();
-        userMap.put("username", userInfo.getUsername());
-        userMap.put("icon", userInfo.getIcon());
-        userMap.put("vip", userInfo.getVip());
-        returnList.add(userMap);
+        UserInfo userInfo = userInfoRepository.findByUsername(name);
+
+        JsonShare jsonShare = new JsonShare();
+        List<Map<String, Object>> returnList = new ArrayList<>();
 
         for (int i = 0; i < list.size(); i++) {
             Map<String, Object> childList = new HashMap<>();
-            childList.put("filename", list.get(i).getFilename());
+            childList.put("fileName", list.get(i).getFileName());
             childList.put("owner", list.get(i).getOwner());
             childList.put("size", list.get(i).getSize());
             childList.put("type", list.get(i).getType());
             childList.put("path", list.get(i).getPath());
             childList.put("time", list.get(i).getTime());
+            childList.put("len", list.get(i).getLength());
             returnList.add(childList);
         }
+        jsonShare.setUsername(userInfo.getUsername());
+        jsonShare.setVip(userInfo.getVip());
+        jsonShare.setUserIntro(userInfo.getIntroduction());
+        jsonShare.setShareName(shareDetails.getShareName());
+        jsonShare.setShareTime(shareDetails.getTime());
+        jsonShare.setType(shareDetails.getType());
+        jsonShare.setFatherPath(shareDetails.getFatherPath());
+        jsonShare.setInfo(returnList);
         if (passwd.equals("-1") || passwd.equals(list.get(0).getPasswd())) {
-            System.out.println("打印returnList" + returnList);
-            return returnList;
+            System.out.println("打印jsonShare" + jsonShare);
+            return jsonShare;
         } else {
             return null;
         }
