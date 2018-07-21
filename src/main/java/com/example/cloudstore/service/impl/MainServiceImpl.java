@@ -7,6 +7,9 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.IOUtils;
+import org.apache.hadoop.io.compress.CompressionCodec;
+import org.apache.hadoop.io.compress.CompressionCodecFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -30,10 +33,10 @@ public class MainServiceImpl implements MainService {
     private String dataLocalName;
 
     @Override
-    public JsonResult mkdirMulu(String pPath, String fileName) throws URISyntaxException{
+    public JsonResult mkdirMulu(String pPath, String fileName) throws URISyntaxException {
         //拼接成创建文件夹的hdfs全路径
-        String muluName = pPath +"/"+ fileName;
-        System.out.println("Path:"+pPath+" "+"filename:"+fileName);
+        String muluName = pPath + "/" + fileName;
+        System.out.println("Path:" + pPath + " " + "filename:" + fileName);
         JsonResult result = new JsonResult();
         Configuration conf = new Configuration();
         Path muluPath = new Path(muluName);
@@ -59,7 +62,7 @@ public class MainServiceImpl implements MainService {
 
     @Override
     public JsonResult lookdir(String muluName) throws URISyntaxException {
-        System.out.println("muluName:"+muluName);
+        System.out.println("muluName:" + muluName);
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         JsonResult result = new JsonResult();
         Configuration conf = new Configuration();
@@ -78,38 +81,48 @@ public class MainServiceImpl implements MainService {
                     String isDir = fileStatus.isDirectory() ? "文件夹" : "文件";
                     long len = fileStatus.getLen();
                     dir.setLen(len);
-                    Long K = len / 1024 ;
+                    Long K = len / 1024;
                     Long M = K / 1024;
                     Long G = M / 1024;
                     String path = fileStatus.getPath().toString();
                     int i1 = path.indexOf("/");
-                    int i2 = path.indexOf("/",i1+1);
-                    int i3 = path.indexOf("/",i2+1);
-                    String Path = "/" + path.substring(i3+1,path.length());
+                    int i2 = path.indexOf("/", i1 + 1);
+                    int i3 = path.indexOf("/", i2 + 1);
+                    String Path = "/" + path.substring(i3 + 1, path.length());
                     Long time = fileStatus.getModificationTime();
                     String fileName = fileStatus.getPath().getName();
                     Date date = new Date(time);
                     String Time = formatter.format(date);
                     dir.setIsDir(isDir);
-                    if (K<1){dir.setSize(len+" B");}
-                    if(K>=1 && K<1024) {dir.setSize(K+" KB");}
-                    if(K>=1024&&M<1024){dir.setSize(M+" MB");}
-                    if(K>=1024 && M>=1024 && G<1024) {dir.setSize(G+" GB");}
-                    if(G>=1024){dir.setSize(G+" GB");}
+                    if (K < 1) {
+                        dir.setSize(len + " B");
+                    }
+                    if (K >= 1 && K < 1024) {
+                        dir.setSize(K + " KB");
+                    }
+                    if (K >= 1024 && M < 1024) {
+                        dir.setSize(M + " MB");
+                    }
+                    if (K >= 1024 && M >= 1024 && G < 1024) {
+                        dir.setSize(G + " GB");
+                    }
+                    if (G >= 1024) {
+                        dir.setSize(G + " GB");
+                    }
                     String type = "";
                     String fileType = "";
-                    if(isDir.equals("文件夹")){
-                        type  = "folder";
+                    if (isDir.equals("文件夹")) {
+                        type = "folder";
                         dir.setType(type);
-                    }else{
-                        type = fileName.substring(fileName.lastIndexOf(".")+1);
+                    } else {
+                        type = fileName.substring(fileName.lastIndexOf(".") + 1);
                         fileType = Type(type);
                         dir.setType(fileType);
                     }
                     dir.setPath(Path);
                     dir.setTime(Time);
                     dir.setFileName(fileName);
-                    System.out.println(isDir + "\t" + len + "\t" + Path + "\t" + fileName + "\t" + Time + "\t" + type+"|"+fileType);
+                    System.out.println(isDir + "\t" + len + "\t" + Path + "\t" + fileName + "\t" + Time + "\t" + type + "|" + fileType);
                     dirs.add(dir);
                 }
                 result.setStatus("查看成功");
@@ -126,10 +139,10 @@ public class MainServiceImpl implements MainService {
 
     @Override
     public JsonResult rename(String oldPath, String newName) throws URISyntaxException {
-        System.out.println("oldpath:"+oldPath+" "+"newName:"+newName);
-        String oldFileName = oldPath.substring(oldPath.lastIndexOf("/")+1);
-        String oldFatherName = oldPath.substring(0,oldPath.length()-oldFileName.length());
-        String newPath = oldFatherName+newName;
+        System.out.println("oldpath:" + oldPath + " " + "newName:" + newName);
+        String oldFileName = oldPath.substring(oldPath.lastIndexOf("/") + 1);
+        String oldFatherName = oldPath.substring(0, oldPath.length() - oldFileName.length());
+        String newPath = oldFatherName + newName;
 
         JsonResult result = new JsonResult();
         Configuration conf = new Configuration();
@@ -141,8 +154,8 @@ public class MainServiceImpl implements MainService {
             fileSystem = FileSystem.get(uri, conf);
             if (fileSystem.exists(newHdfsPath)) {
                 result.setStatus("文件已经存在！");
-            } else{
-                fileSystem.rename(oldHdfsPath,newHdfsPath);
+            } else {
+                fileSystem.rename(oldHdfsPath, newHdfsPath);
                 result.setStatus("修改成功");
             }
             result.setResult(newName.substring(newName.lastIndexOf("/") + 1));
@@ -207,12 +220,12 @@ public class MainServiceImpl implements MainService {
                 if (!fileSystem.exists(newfatherPath)) {
                     result.setStatus("移动失败");
                     result.setResult("新文件夹不存在！");
-                } else if (newFatherPath.equals(oldDirPath) || newFatherPath.startsWith(oldDirPath.substring(0,oldDirPath.length()))) {
+                } else if (newFatherPath.equals(oldDirPath) || newFatherPath.startsWith(oldDirPath.substring(0, oldDirPath.length()))) {
                     result.setStatus("移动失败");
-                    result.setResult(newDirPath.substring(newDirPath.lastIndexOf("/")+1)+"不能移动到本文件夹或其子文件夹下");
+                    result.setResult(newDirPath.substring(newDirPath.lastIndexOf("/") + 1) + "不能移动到本文件夹或其子文件夹下");
                 } else if (fileSystem.exists(newPath)) {
                     result.setStatus("移动失败");
-                    result.setResult("该目录下已经存在"+newDirPath.substring(newDirPath.lastIndexOf("/")+1));
+                    result.setResult("该目录下已经存在" + newDirPath.substring(newDirPath.lastIndexOf("/") + 1));
                 } else {
                     fileSystem.rename(oldHdfsPath, newPath);
                     result.setStatus("移动成功");
@@ -240,7 +253,7 @@ public class MainServiceImpl implements MainService {
                 // 如果用户目录不存在，则在服务器中创建
                 String userFatherFileName = srcName.split("/")[1];
                 System.out.println(userFatherFileName);
-                File userFolder = new File(dataLocalName+userFatherFileName);
+                File userFolder = new File(dataLocalName + userFatherFileName);
                 if (!userFolder.exists()) {
                     userFolder.mkdir();
                 }
@@ -254,7 +267,7 @@ public class MainServiceImpl implements MainService {
                 File[] files = userFolder.listFiles();
                 for (File targetFile : files) {
                     if (targetFile.getName().equals(fileName)) {
-                        result = uploadHDFS(targetFile,srcName,mulupath);
+                        result = uploadHDFS(targetFile, srcName, mulupath);
                     }
                 }
             } catch (FileNotFoundException e) {
@@ -273,11 +286,67 @@ public class MainServiceImpl implements MainService {
         return ResponseEntity.ok(result);
     }
 
+    @Override
+    public void decompress(String path) throws URISyntaxException {
+        //这里我们用传入的第一个参数作为我们要解压缩的文件地址的uri
+        String hdfs_path = HDFS_PATH;
+
+        String uri = hdfs_path + path;
+
+        //获取配置文件对象，并加载到内存中
+
+        Configuration conf = new Configuration();
+
+        //这里我们将输入流和输出流定义出来方便下面使用
+
+        InputStream in = null;
+        OutputStream out = null;
+        try {
+
+            //获取文件系统对象
+
+            FileSystem fs = FileSystem.get(URI.create(uri), conf);
+
+            //将uri封装成hadoop的Path对象
+
+            Path inpath = new Path(uri);
+
+            //获取一个压缩格式的工厂类，为下面做铺垫
+
+            CompressionCodecFactory factory = new CompressionCodecFactory(conf);
+
+            //调用工厂类的getCodec方法，这时就得到了压缩格式的对象（这里就是智能匹配压缩格式的关键）
+
+            CompressionCodec codec = factory.getCodec(inpath);
+
+            //这里的意思是调用工厂的removeSuffix方法将文件后缀名去除第二个参数就是文件的后缀名。这里其实是文件解压过后的地址，大家想一想，文件压缩前都是带着后缀名，将文件解压过后文件的后缀就消失了，这里就相当于文件解压后的地址
+
+            String outputuri = CompressionCodecFactory.removeSuffix(uri, codec.getDefaultExtension());
+            //创建一个输入流
+            in = codec.createInputStream(fs.open(inpath));
+
+            //创建一个输出流
+
+            out = fs.create(new Path(outputuri));
+
+            //将文件写入hdfs中
+
+            IOUtils.copyBytes(in, out, 1024, false);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            //关闭流
+            IOUtils.closeStream(in);
+            IOUtils.closeStream(out);
+        }
+    }
+
+
     public String Type(String type) {
         if(type.equals("jpg")||type.equals("png")||type.equals("gif")||type.equals("gpeg")||type.equals("pic")||type.equals("bmp")){
             return "img";
         }
-        if (type.equals("zip")|| type.equals("rar")||type.equals("gz")){
+        if (type.equals("zip")|| type.equals("rar")||type.equals("gz")||type.equals("bz2")||type.equals("lzo")||type.equals("deflate")||type.equals("LZ4")||type.equals("snappy")){
             return "zip";
         }
         if (type.equals("avi")|| type.equals("mov") || type.equals("swf")|| type.equals("mpg")|| type.equals("mp4")){

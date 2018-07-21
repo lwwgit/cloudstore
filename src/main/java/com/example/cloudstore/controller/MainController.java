@@ -83,5 +83,20 @@ public class MainController {
 		return mainService.move(oldDirPaths, newFatherPath);
 	}
 
+	@PostMapping("/decompress")
+	public  JsonResult decompress(@RequestParam String path) throws URISyntaxException{
+		JsonResult jsonResult = new JsonResult();
+		String fileName = path.substring(path.lastIndexOf("/")+1);
+		String  suffix = fileName.substring(fileName.lastIndexOf(".")+1);
+		if(suffix.equals("gz")||suffix.equals("bz2")||suffix.equals("lzo")||suffix.equals("deflate")||suffix.equals("LZ4")||suffix.equals("snappy")){
+			mainService.decompress(path);
+			jsonResult.setStatus("解压成功");
+			jsonResult.setResult("解压成功");
+		}else{
+			jsonResult.setStatus("解压失败");
+			jsonResult.setResult("暂时不支持此格式");
+		}
+		return jsonResult;
+	}
 
 }

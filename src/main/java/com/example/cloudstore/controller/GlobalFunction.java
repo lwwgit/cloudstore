@@ -50,13 +50,14 @@ public class GlobalFunction {
     public String getDirectorySize(String path) throws URISyntaxException, IOException {
 
         /**
+         * todo
          * 这里必须重新声明一下HADOOP_URL
          * 不然识别不出来
          * 不要问我为什么
          * 因为宝宝也不知道
          **/
 
-        String HADOOP_URL = "hdfs://192.168.220.135:9000/";
+        String HADOOP_URL = "hdfs://192.168.150.134:9000/";
         FileSystem hdfs = null;
         Configuration config = new Configuration();
         // 程序配置

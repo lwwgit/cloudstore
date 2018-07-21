@@ -2,6 +2,8 @@ package com.example.cloudstore.service;
 
 
 import com.example.cloudstore.domain.entity.SysUser;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 /**
  * @Author jitdc
@@ -28,4 +30,5 @@ public interface SysUserService {
      * @Description: 修改SysUser的数据
      */
     SysUser update(SysUser user);
+
 }

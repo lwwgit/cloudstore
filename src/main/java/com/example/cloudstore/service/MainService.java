@@ -9,6 +9,7 @@ import java.net.URISyntaxException;
 import java.util.List;
 
 public interface MainService {
+    void decompress(String path) throws URISyntaxException;
     JsonResult mkdirMulu(String pPath, String fileName) throws URISyntaxException;
     JsonResult lookdir(String muluName) throws URISyntaxException;
     JsonResult rename( String oldPath, String newName) throws URISyntaxException;

@@ -41,7 +41,7 @@ public class DownloadController {
                 response.setContentType("application/force-download");// 设置强制下载不打开
                 String File_name = new String(fileName.getBytes(), "ISO-8859-1");
                 response.addHeader("Content-Disposition", "attachment;fileName=" + File_name);// 设置文件名
-                byte[] buffer = new byte[1024];
+                byte[] buffer = new byte[1024 * 64];
                 FileInputStream fis = null;
                 BufferedInputStream bis = null;
                 try {
