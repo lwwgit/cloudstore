@@ -51,12 +51,12 @@ public class SortServiceImpl implements SortService {
 
         //文件分类
         String[] doc = new String[]{"docx", "doc", "xlsx", "xls", "pptx", "ppt", "txt", "pdf", "c"};
-        String[] pict = new String[]{"jpg", "png", "gif", "jpeg", "bmp"};
+        String[] pict = new String[]{"jpg", "png", "gif", "jpeg", "bmp", "JPG"};
         String[] video = new String[]{"avi", "mov", "mp4", "wmv", "mkv", "flv"};
         String[] music = new String[]{"wav", "mp3", "wma", "aac", "flac", "ram", "m4a"};
         String[] other = new String[]{
                 "docx", "doc", "xlsx", "xls", "pptx", "ppt", "txt", "pdf",
-                "jpg", "png", "gif", "jpeg",
+                "jpg", "png", "gif", "jpeg", "JPG",
                 "avi", "mov", "mp4", "wmv", "mkv", "flv",
                 "wav", "mp3", "wma", "aac", "flac"};
 
@@ -92,7 +92,7 @@ public class SortServiceImpl implements SortService {
                 list.put("path", truePath);
                 list.put("time", formatter.format(files[i].getModificationTime()));
                 list.put("size", globalFunction.getFileSize(files[i].getLen()));
-                list.put("length", files[i].getLen());
+                list.put("len", files[i].getLen());
                 list.put("type", globalFunction.getFileType(suffix));
 
                 if (flag == 1) {
@@ -146,7 +146,19 @@ public class SortServiceImpl implements SortService {
 
     @Override
     public List<Map<String, Object>> SortCapacity() throws IOException, URISyntaxException {
+
         GlobalFunction globalFunction = new GlobalFunction();
+
+        /*** 测试时要修改username ***/
+        String username = globalFunction.getUsername();
+//        String username = "lww";
+
+        UserStore userStore = userStoreRepository.findByUsername(username);
+        String availableCapacity = userStore.getAvailableCapacity();
+
+        //设置百分比计算时需要保留的小数位
+        NumberFormat numberFormat = NumberFormat.getInstance();
+        numberFormat.setMaximumFractionDigits(2); //保留四位小数
 
         List<Map<String, Object>> returnList = new ArrayList<>();
         for (int flag = 1; flag <= 5; flag++) {
@@ -167,6 +179,7 @@ public class SortServiceImpl implements SortService {
                 map.put("type", "other");
             }
 
+            //根据flag循环遍历不同类型的文件，生成MapList
             List<Map<String, Object>> list = SortFile(flag);
 
             //获取length, size, availableCapacity这些变量
@@ -174,28 +187,56 @@ public class SortServiceImpl implements SortService {
             for (int i = 0; i < list.size(); i++) {
                 length += Long.valueOf(list.get(i).get("length").toString());
             }
+//            totalLength += length;
             String size = globalFunction.getFileSize(length);
-//                String username = globalFunction.getUsername();
-            String username = "lww";
-            UserStore userStore = userStoreRepository.findByUsername(username);
-            String availableCapacity = userStore.getAvailableCapacity();
 
-            //计算已用空间的百分比
-            float numOnly = Float.valueOf(StringUtils.substringBefore(availableCapacity, "G"));
-            float num1 = length;
-            float num2 = numOnly;
-            NumberFormat numberFormat = NumberFormat.getInstance();
-            numberFormat.setMaximumFractionDigits(2); //保留两位小数
-            String scale = numberFormat.format(num1 / (num2 * 1024 * 1024 * 1024));
+            //计算该类文件占所有用户文件容量的百分比
+            long numOnly = Long.valueOf(StringUtils.substringBefore(availableCapacity, "G"));
+            float num1 = (float) length;
+            float scale = Float.valueOf(numberFormat.format(num1 / (numOnly * 1024 * 1024 * 1024) * 100));
 
-            //添加数据，生成map
+            //添加数据，生成该类型文件的map，并添加到returnList中
             map.put("length", length);
             map.put("size", size);
-            map.put("avaliableCapacity", availableCapacity);
+            map.put("availableCapacity", availableCapacity);
             map.put("scale", scale);
 
             returnList.add(map);
         }
+        /*****************/
+//        System.out.println("大小返回1： " + globalFunction.getDirectorySize("/" + username));
+        long totalLength = Long.valueOf(globalFunction.getDirectorySize("/" + username));
+//        System.out.println("get totalLength: " + totalLength);
+       /*****************/
+        //计算和添加所有已用类型的总数据
+
+        String totalSize = globalFunction.getFileSize(totalLength);
+
+        Long numOnly = Long.valueOf(StringUtils.substringBefore(availableCapacity, "G"));
+        float num2 = totalLength;
+
+        Float totalScale = Float.valueOf(numberFormat.format(num2 / (numOnly * 1024 * 1024 * 1024) * 100));
+        Map<String, Object> map = new HashMap<>();
+        map.put("type", "total");
+        map.put("length", totalLength);
+        map.put("size", totalSize);
+        map.put("scale", totalScale);
+        map.put("availableCapacity", availableCapacity);
+        returnList.add(map);
+
+        //计算每个类型所占空间占所有已用空间的比例
+        for (int j = 0; j < returnList.size(); j++) {
+
+            if (totalLength == 0) {
+                returnList.get(j).put("laterScale", 0);
+            } else {
+                float n1 = Long.valueOf(returnList.get(j).get("length").toString());
+                float laterScale = Float.valueOf(numberFormat.format(n1 / totalLength * 100));
+                returnList.get(j).put("laterScale", laterScale);
+            }
+        }
+
         return returnList;
     }
+
 }

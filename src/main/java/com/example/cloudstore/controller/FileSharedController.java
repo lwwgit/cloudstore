@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Map;
 
 @RestController
 public class FileSharedController {
@@ -21,26 +22,53 @@ public class FileSharedController {
     @PostMapping("/get/shared/link")
     public Result GetSharedLink(@RequestParam("filePath") String[] paths,
                                 @RequestParam("ifPasswd") String ifPasswd) throws IOException, URISyntaxException {
+        System.out.println("打印filePath" + paths + "\n是否密码" + ifPasswd);
         return ResultUtil.success(fileSharedService.CreateSharedLink(paths, ifPasswd));
     }
 
+    //显示当前用户所有分享
+    @PostMapping("/home/share/all")
+    public Result AllShare() {
+        return ResultUtil.success(fileSharedService.AllShare());
+    }
+
+    //根据分享文件的路径和链接id，取消分享链接（在数据库中删除）
+    @PostMapping("/home/share/remove")
+    public Result removeShare(@RequestParam("id") String[] id) {
+        return ResultUtil.success(fileSharedService.RemoveShare(id));
+    }
+
+
+    /******* 以下url需要放行 *******/
     //验证该链接是否为加密链接，返回yes/no给前端
     @PostMapping("/home/share")
-    public Result ShareVerify(@RequestParam("id") String id) {
-        return ResultUtil.success(fileSharedService.ShareVerify(id));
+    public Result ShareVerify(@RequestParam("id") String id,
+                              @RequestParam("username") String username) {
+
+        System.out.println("接收打印id和username: " + id + " " + username);
+
+        Map<String, Object> returnMap = fileSharedService.ShareVerify(id, username);
+
+        System.out.println("controller里面的returnMap: " + returnMap);
+
+        if (returnMap.get("ifPasswd").equals("yes")){
+            return ResultUtil.success(returnMap);
+        }
+        if (returnMap.get("ifPasswd").equals("no")){
+            return ResultUtil.success(fileSharedService.ToShare(id, "-1"));
+        }
+        return ResultUtil.error(0, "ifPasswd is not yes/no");
     }
 
     //根据链接id和passwd，返回链接信息给前端
     @PostMapping("/home/share/goto")
     public Result ToShare(@RequestParam("id") String id,
-                          @RequestParam("passwd") String passwd){
+                          @RequestParam("passwd") String passwd) {
         return ResultUtil.success(fileSharedService.ToShare(id, passwd));
     }
 
-    //根据分享文件的路径和链接id，取消分享链接（在数据库中删除）
-    @PostMapping("/home/share/remove")
-    public Result removeShare(@RequestParam("id") String id,
-                              @RequestParam("path") String path){
-        return ResultUtil.success(fileSharedService.RemoveShare(id, path));
+    @PostMapping("/home/share/report")
+    public Result report(@RequestParam("id") String id){
+        return ResultUtil.success(fileSharedService.Report(id));
     }
 }
