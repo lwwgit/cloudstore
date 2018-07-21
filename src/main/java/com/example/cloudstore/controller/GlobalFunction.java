@@ -1,5 +1,6 @@
 package com.example.cloudstore.controller;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
@@ -46,7 +47,7 @@ public class GlobalFunction {
 
     /**
      * 获取文件夹大小
-     * **/
+     **/
     public String getDirectorySize(String path) throws URISyntaxException, IOException {
 
         /**
@@ -55,8 +56,8 @@ public class GlobalFunction {
          * 不要问我为什么
          * 因为宝宝也不知道
          **/
-
-        String HADOOP_URL = "hdfs://192.168.220.135:9000/";
+        System.out.println("全局函数: " + path);
+        String HADOOP_URL = "hdfs://192.168.220.137:9000/";
         FileSystem hdfs = null;
         Configuration config = new Configuration();
         // 程序配置
@@ -68,19 +69,18 @@ public class GlobalFunction {
         FileStatus fileStatus = hdfs.getFileStatus(newPath);
 //        System.out.println("dir3的文件夹大小是：" + hdfs.getContentSummary(new Path(path)).getLength());
 
-        if (fileStatus.isDirectory()){
-            return String.valueOf(getFileSize(hdfs.getContentSummary(new Path(path)).getLength()));
+        if (fileStatus.isDirectory()) {
+            return String.valueOf(hdfs.getContentSummary(new Path(path)).getLength());
         }
-        if (fileStatus.isFile()){
+        if (fileStatus.isFile()) {
             return "Error. It's not a directory";
         }
         return "Error.Input is error";
     }
 
-
-
     /**
      * 根据配置文件获取HDFS操作对象
+     *
      * @return
      * @throws IOException
      */
@@ -88,14 +88,14 @@ public class GlobalFunction {
         //读取配置文件
         Configuration config = new Configuration();
         config.set("fs.defaultFS", HADOOP_URL);
-        config.set("fs.hdfs.impl.disable.cache","true");
+        config.set("fs.hdfs.impl.disable.cache", "true");
         FileSystem fs = null;
         try {
             // 根据配置文件创建HDFS对象
             fs = FileSystem.get(config);
         } catch (IOException e) {
             e.printStackTrace();
-            logger.error("",e);
+            logger.error("", e);
         }
         return fs;
     }
@@ -107,8 +107,8 @@ public class GlobalFunction {
         String[] pptType = {"ppt", "pptx"};
         String[] txtType = {"txt"};
         String[] xlsType = {"xls", "xlsx"};
-        String[] codeType = {"c", "java", "h", "html", "css", "php", "jsp", "cpp", "md","py"};
-        String[] imgType = {"jpg", "png", "gif", "jpeg", "bmp"};
+        String[] codeType = {"c", "java", "h", "html", "css", "php", "jsp", "cpp", "md", "py"};
+        String[] imgType = {"jpg", "png", "gif", "jpeg", "bmp", "JPG"};
         String[] musicType = {"wav", "mp3", "wma", "aac", "flac", "ram", "m4a"};
         String[] videoType = {"avi", "mov", "mp4", "wmv", "mkv", "flv"};
         String[] zipType = {"rar", "zip", "gz", "arj", "z"};
@@ -178,21 +178,23 @@ public class GlobalFunction {
         return "others";
     }
 
-    /**单位换算*/
+    /**
+     * 单位换算
+     */
     public String getFileSize(long filesize) {
         StringBuffer mstrbuf = new StringBuffer();
         DecimalFormat df = new DecimalFormat("#.00");
         if (filesize < 1024) {
             mstrbuf.append(filesize);
             mstrbuf.append(" B");
-        } else if (filesize < 1024*1024) {
+        } else if (filesize < 1024 * 1024) {
             mstrbuf.append(df.format((double) filesize / 1024));
             mstrbuf.append(" KB");
-        } else if (filesize < 1024*1024*1024) {
-            mstrbuf.append(df.format((double) filesize / (1024*1024)));
+        } else if (filesize < 1024 * 1024 * 1024) {
+            mstrbuf.append(df.format((double) filesize / (1024 * 1024)));
             mstrbuf.append(" MB");
         } else {
-            mstrbuf.append(df.format((double) filesize / (1024*1024*1024) ));
+            mstrbuf.append(df.format((double) filesize / (1024 * 1024 * 1024)));
             mstrbuf.append(" GB");
         }
         return mstrbuf.toString();

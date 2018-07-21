@@ -12,11 +12,11 @@ public interface FileSharedRepository extends JpaRepository<FileShared, String> 
 
     List<FileShared> findAllByCharId(String charId);
 
-    FileShared findByCharIdAndPath(String charId, String path);
+    FileShared findByCharId(String charId);
 
     @Modifying
     @Transactional
-    @Query("delete from FileShared file where file.charId=?1 and file.path=?2")
-    void deleteByCharIdAndPath(String charId, String path);
+    @Query("delete from FileShared file where file.charId=?1")
+    void deleteAllByCharId(String charId);
 
 }

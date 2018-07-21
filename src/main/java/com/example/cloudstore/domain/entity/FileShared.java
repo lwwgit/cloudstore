@@ -15,7 +15,7 @@ public class FileShared {
     private String charId;
 
     /**** 分享的文件名 ***/
-    private String filename;
+    private String fileName;
     /***** 文件拥有者 ***/
     private String owner;
     /***** 文件大小 ****/
@@ -24,10 +24,14 @@ public class FileShared {
     private String type;
     /**** 文件路径 ****/
     private String path;
-
+    /**** 是否有密码 ***/
     private String ifPasswd;
-
+    /**** 分享密码 ***/
     private String passwd;
+    /**** 分享生成时间 ****/
+    private String time;
+    /**** 文件实际长度 ****/
+    private long length;
 
     public Integer getId() {
         return id;
@@ -45,12 +49,12 @@ public class FileShared {
         this.charId = charId;
     }
 
-    public String getFilename() {
-        return filename;
+    public String getFileName() {
+        return fileName;
     }
 
-    public void setFilename(String filename) {
-        this.filename = filename;
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 
     public String getOwner() {
@@ -99,5 +103,21 @@ public class FileShared {
 
     public void setPasswd(String passwd) {
         this.passwd = passwd;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
+
+    public String getTime() {
+        return time;
+    }
+
+    public long getLength() {
+        return length;
+    }
+
+    public void setLength(long length) {
+        this.length = length;
     }
 }

@@ -5,6 +5,8 @@ import com.example.cloudstore.domain.entity.SysUser;
 import com.example.cloudstore.repository.SysUserRepository;
 import com.example.cloudstore.service.SysUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -32,4 +34,6 @@ public class SysUserServiceImpl implements SysUserService {
     public SysUser update(SysUser user) {
         return repository.save(user);
     }
+
+
 }

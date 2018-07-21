@@ -14,6 +14,7 @@ public class HDFS_Downloader
 
     //TODO 此处下面需要更改hdfs地址
 
+
     public static FileSystem hdfs;
 
     public static void downloadFile(String srcPath, String dstPath) throws Exception
@@ -24,7 +25,7 @@ public class HDFS_Downloader
         {
             in = hdfs.open(new Path(srcPath));
             out = new FileOutputStream(dstPath);
-            IOUtils.copyBytes(in, out, 4096, false);
+            IOUtils.copyBytes(in, out, 1024 * 64, false); //原来是4096
         }
         finally
         {
@@ -54,7 +55,7 @@ public class HDFS_Downloader
     public static void download(String srcPath, String dstPath) throws Exception
     {
         Configuration conf = new Configuration();
-        URI uri = new URI("hdfs://192.168.163.130:9000/");
+        URI uri = new URI("hdfs://192.168.150.134:9000/");
         hdfs = FileSystem.get(uri, conf);
         if (hdfs.isFile(new Path(srcPath)))
         {
