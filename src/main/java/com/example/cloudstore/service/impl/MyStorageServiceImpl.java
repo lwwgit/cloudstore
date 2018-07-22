@@ -34,6 +34,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 /**
  * @Author jitdc
@@ -150,6 +151,20 @@ public class MyStorageServiceImpl implements MyStorageService {
             boolean flag = renameFile(tmpFile, fileName);
             if (flag)
                 System.out.println("重命名成功了！");
+            Md5 byFileNameAndPath = md5Repository.findByFileNameAndPath(fileName, path);
+            if (byFileNameAndPath != null){
+                File file = new File(uploadDirPath+"/"+fileName);
+                Integer tmp;
+                String tempDirName = "";
+                for (int i=0;i<4;i++) {
+                    tmp = new Random().nextInt(10);
+                    tempDirName = tempDirName+String.valueOf(tmp);
+                }
+                fileName = tempDirName+"-"+fileName;
+                boolean b = renameFile(file, fileName);
+                if (b)
+                    System.out.println("副本文件重命名成功！");
+            }
             File file = new File(uploadDirPath+"/"+fileName);
             if (file.exists()){
  //               List<Md5> tmps = md5Repository.findByFileMd5AndFileNameAndUsername(param.getMd5(), param.getName(),username);
@@ -175,7 +190,7 @@ public class MyStorageServiceImpl implements MyStorageService {
                     Md5 md51 = new Md5();
                     md51.setUid(param.getUid());
                     md51.setUsername(username);
-                    md51.setFileName(param.getName());
+                    md51.setFileName(fileName);
                     md51.setFileMd5(param.getMd5());
                     md51.setPath(path);
                     md51.setCreateTime(new Date());

@@ -14,7 +14,7 @@ import java.util.Date;
 @Entity
 public class Md5 {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Integer id;
 
     private String uid;

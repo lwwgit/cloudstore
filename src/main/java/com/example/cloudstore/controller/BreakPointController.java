@@ -9,8 +9,10 @@ package com.example.cloudstore.controller;
 
 import com.example.cloudstore.domain.*;
 import com.example.cloudstore.domain.entity.SysUser;
+import com.example.cloudstore.domain.entity.UserStore;
 import com.example.cloudstore.enums.ResultStatus;
 import com.example.cloudstore.repository.Md5Repository;
+import com.example.cloudstore.repository.UserStoreRepository;
 import com.example.cloudstore.service.*;
 import com.example.cloudstore.utils.ResultUtil;
 import org.apache.commons.io.FileUtils;
@@ -61,6 +63,8 @@ public class BreakPointController {
     private Md5Repository md5Repository;
     @Autowired
     private RecoveryFileService recoveryFileService;
+    @Autowired
+    private UserStoreRepository userStoreRepository;
     /**
      * 秒传判断，断点判断
      *
@@ -72,8 +76,20 @@ public class BreakPointController {
        //  myStorageService.deleteAll();
       // stringRedisTemplate.opsForHash().delete(Constants.FILE_UPLOAD_STATUS, myMd5.getFileMd5());
         GlobalFunction globalFunction =new GlobalFunction();
-//        String directorySize = globalFunction.getDirectorySize("/" + username);
-//        System.out.println("该用户云盘空间已用："+directorySize);
+        String directorySize = globalFunction.getDirectorySize("/" + username);
+        System.out.println("该用户云盘空间已用："+directorySize+";文件大小："+fileSize);
+        long dirSize = Long.parseLong(directorySize);
+        long upfilesize = Long.parseLong(fileSize);
+        long size = dirSize+upfilesize;
+        UserStore byUsername = userStoreRepository.findByUsername(username);
+        String tmpSizeUserHas = byUsername.getAvailableCapacity().substring(0,byUsername.getAvailableCapacity().length()-2) ;
+        System.out.println("该用户拥有的空间大小："+tmpSizeUserHas+"GB");
+        long sizeUserHas = Long.parseLong(tmpSizeUserHas);
+        long allSizeUserHas = sizeUserHas*1024*1024*1024;
+        System.out.println("该用户拥有的空间大小："+allSizeUserHas+"B");
+        if (size > allSizeUserHas){
+            return new ResultVo(ResultStatus.OUT_SPACE);
+        }
         Object processingObj = stringRedisTemplate.opsForHash().get(Constants.FILE_UPLOAD_STATUS, myMd5.getFileMd5());
         List<Md5> byFileMd51 = md5Repository.findByFileMd5(myMd5.getFileMd5());
         Md5 byMd5AndPathAndFilename = md5service.findByMd5AndPathAndFilename(myMd5.getFileMd5(), myMd5.getPath(), myMd5.getFileName());
@@ -87,6 +103,10 @@ public class BreakPointController {
         if (processing) {//该文件已经上传过了 —— 下面所有的功能都是秒传
             //先判断这次上传的文件在当前路径下是否存在
             List<Md5> byMd5AndPath = md5service.findByMd5AndPath(myMd5.getFileMd5(), myMd5.getPath());
+            Md5 byFileNameAndPath = md5Repository.findByFileNameAndPath(myMd5.getFileName(), myMd5.getPath());
+            if (byMd5AndPath.size()!=0 && byFileNameAndPath != null){
+                return new ResultVo(ResultStatus.IS_HAVE, value);
+            }
             List<Md5> byMd5AndFilename = md5service.findByMd5AndFilename(myMd5.getFileMd5(), myMd5.getFileName());
             //从文件系统中找到一个Md5值相同的文件
             List<Md5> byFileMd5 = md5service.findByFileMd5(myMd5.getFileMd5());
@@ -101,7 +121,7 @@ public class BreakPointController {
                 boolean b = copyFileService.copyFile(tmpMd5.getPath() + "/" + tmpMd5.getFileName(), myMd5.getPath());
                 // 同一个文件，文件名修改了，内容没变
                 // 文件名没有修改，从文件系统中复制一个md5值相同的文件到当前路径下
-                if (byMd5AndPathAndFilename== null){ // 同一个文件，文件名修改了，内容没变
+                if (!myMd5.getFileName().equals(tmpMd5.getFileName())){ // 同一个文件，文件名修改了，内容没变
                     //先从文件系统中复制一个md5值相同的文件到当前路径下，然后重命名文件为myMd5.getFileName()
                     if (b){
                        //如果复制成功了，再调用重命名方法。然后删除数据库中由于复制而多出来的一条数据
