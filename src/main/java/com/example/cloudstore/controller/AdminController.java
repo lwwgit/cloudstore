@@ -3,6 +3,7 @@ package com.example.cloudstore.controller;
 
 import com.example.cloudstore.domain.JsonResult;
 import com.example.cloudstore.domain.JsonUser2Adm;
+import com.example.cloudstore.domain.entity.SysUser;
 import com.example.cloudstore.service.AdminService;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -11,12 +12,16 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.awt.print.Pageable;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.*;
 
 @RestController
@@ -31,7 +36,7 @@ public class AdminController {
             @ApiImplicitParam(name = "username", value = "用户名", required = true, dataType = "String", paramType = "query"),
     })
     @PostMapping("/specialDisplay")
-    public JsonResult specialDisplay(@RequestParam String username){
+    public JsonResult specialDisplay(@RequestParam String username) throws URISyntaxException{
         JsonResult jsonResult = new JsonResult();
         jsonResult.setStatus("查找成功");
         jsonResult.setResult(adminService.specificDisply(username));
@@ -40,13 +45,23 @@ public class AdminController {
 
     @ApiOperation(value = "登录上来就可以查看到的用户列表", notes = "用户的基本信息和文件夹")
     @PostMapping("/infoDisplay")
-    public JsonResult InfoDisplay() {
+    public JsonResult InfoDisplay(@RequestParam Integer currentPage, @RequestParam Integer pageSize) {
         JsonResult jsonResult = new JsonResult();
-        List<JsonUser2Adm> jsonUser2Adms= adminService.InfoDisplay();
-        jsonResult.setResult(jsonUser2Adms);
+        PageRequest pageable =  PageRequest.of(currentPage,pageSize);
+        jsonResult.setResult(adminService.UserDisplay(pageable));
+        return jsonResult;
+    }
+
+    @ApiOperation(value = "查看用户详细信息", notes = "")
+    @PostMapping("/userInfoDisplay")
+    public JsonResult UserInfoDisplay(@RequestParam String username){
+        JsonResult jsonResult = new JsonResult();
+        jsonResult.setResult(adminService.userInfoDisplay(username));
         jsonResult.setStatus("查看成功");
         return jsonResult;
     }
+
+
 
     @ApiOperation(value = "查看vip用户信息", notes = "vip用户的基本信息和文件夹")
     @PostMapping("/vipInfoDisplay")
@@ -175,6 +190,24 @@ public class AdminController {
         JsonResult jsonResult = new JsonResult();
         jsonResult.setStatus("获得数据成功");
         jsonResult.setResult(adminService.cityDistribution());
+        return jsonResult;
+    }
+
+    @PostMapping("/areaData")
+    public JsonResult areaData(){
+        JsonResult jsonResult = new JsonResult();
+        jsonResult.setStatus("获得数据成功");
+        jsonResult.setResult(adminService.areaData());
+        return jsonResult;
+    }
+
+
+    @ApiOperation(value = "使用情况", notes = "")
+    @PostMapping("/capacity")
+    public JsonResult Capacity(){
+        JsonResult jsonResult = new JsonResult();
+        jsonResult.setStatus("获得数据成功");
+        jsonResult.setResult(adminService.cap());
         return jsonResult;
     }
 

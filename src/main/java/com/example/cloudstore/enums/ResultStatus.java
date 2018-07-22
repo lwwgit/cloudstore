@@ -13,6 +13,8 @@ public enum ResultStatus {
      */
     IS_HAVE(100, "文件已存在！"),
 
+    OUT_SPACE(104, "内存不足！"),
+
     NO_HAVE(101, "该文件没有上传过。"),
 
     ING_HAVE(102, "该文件上传了一部分。"),

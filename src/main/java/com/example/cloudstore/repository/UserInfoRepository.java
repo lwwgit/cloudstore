@@ -30,20 +30,20 @@ public interface UserInfoRepository extends JpaRepository<UserInfo,Integer> {
      int cancleVip( String username);
 
      //开始年龄分布查询
-     @Query("select count(u) from UserInfo  u where u.age > 0 and u.age <= 10")
-     Integer Zero2Ten();
-     @Query("select count(u) from UserInfo  u where u.age > 10 and u.age <= 20")
-     Integer Ten2Twenty();
-     @Query("select count(u) from UserInfo  u where u.age > 20 and u.age <= 30")
-     Integer Twenty2Thirty();
-     @Query("select count(u) from UserInfo  u where u.age > 30 and u.age <= 40")
-     Integer Thirty2Forty();
-     @Query("select count(u) from UserInfo  u where u.age > 40 and u.age <= 50")
-     Integer Forty2Fifty();
-     @Query("select count(u) from UserInfo  u where u.age > 50 and u.age <= 60")
-     Integer Fifty2Sixty();
-     @Query("select count(u) from UserInfo  u where u.age > 60")
-     Integer MoerThanSixty();
+     @Query("select count(u) from UserInfo  u where u.age >= 0 and u.age < 10")
+     Integer shisuiyixia();
+     @Query("select count(u) from UserInfo  u where u.age >= 10 and u.age < 19")
+     Integer shi2shijiu();
+     @Query("select count(u) from UserInfo  u where u.age >= 20 and u.age < 29")
+     Integer ershi2erjiu();
+     @Query("select count(u) from UserInfo  u where u.age >= 30 and u.age < 39")
+     Integer sanshi2sanjiu();
+     @Query("select count(u) from UserInfo  u where u.age >= 40 and u.age < 49")
+     Integer sishi2sijiu();
+     @Query("select count(u) from UserInfo  u where u.age >= 50 and u.age < 59")
+     Integer wushi2wujiu();
+     @Query("select count(u) from UserInfo  u where u.age >= 60")
+     Integer liushiyishang();
 
 
      //开始地区分布查询
@@ -64,4 +64,78 @@ public interface UserInfoRepository extends JpaRepository<UserInfo,Integer> {
      @Query("select count(u) from UserInfo  u where u.city='香港' or u.city='澳门' or u.city='台湾'")
      Integer GangAoTai();
 
+     //开始各个省市的详细分布查询
+     @Query("select count(u) from UserInfo  u where u.city = '山东'")
+     Integer shandong();
+     @Query("select count(u) from UserInfo  u where u.city = '江苏'")
+     Integer jiangsu();
+     @Query("select count(u) from UserInfo  u where u.city = '安徽'")
+     Integer anhui();
+     @Query("select count(u) from UserInfo  u where u.city = '浙江'")
+     Integer zhejiang();
+     @Query("select count(u) from UserInfo  u where u.city = '福建'")
+     Integer fujian();
+     @Query("select count(u) from UserInfo  u where u.city = '上海'")
+     Integer shanghai();
+     @Query("select count(u) from UserInfo  u where u.city = '广东'")
+     Integer guangdong();
+     @Query("select count(u) from UserInfo  u where u.city = '广西'")
+     Integer guangxi();
+     @Query("select count(u) from UserInfo  u where u.city = '海南'")
+     Integer hainan();
+     @Query("select count(u) from UserInfo  u where u.city = '湖北'")
+     Integer hubei();
+     @Query("select count(u) from UserInfo  u where u.city = '湖南'")
+     Integer hunan();
+     @Query("select count(u) from UserInfo  u where u.city = '河南'")
+     Integer henan();
+     @Query("select count(u) from UserInfo  u where u.city = '江西'")
+     Integer jiangxi();
+     @Query("select count(u) from UserInfo  u where u.city = '北京'")
+     Integer beijing();
+     @Query("select count(u) from UserInfo  u where u.city = '天津'")
+     Integer tianjin();
+     @Query("select count(u) from UserInfo  u where u.city = '河北'")
+     Integer hebei();
+     @Query("select count(u) from UserInfo  u where u.city = '山西'")
+     Integer shanxi();
+     @Query("select count(u) from UserInfo  u where u.city = '内蒙古'")
+     Integer neimenggu();
+     @Query("select count(u) from UserInfo  u where u.city = '宁夏'")
+     Integer ningxia();
+     @Query("select count(u) from UserInfo  u where u.city = '新疆'")
+     Integer xinjiang();
+     @Query("select count(u) from UserInfo  u where u.city = '青海'")
+     Integer qinghai();
+     @Query("select count(u) from UserInfo  u where u.city = '陕西'")
+     Integer shanxi3();
+     @Query("select count(u) from UserInfo  u where u.city = '甘肃'")
+     Integer gansu();
+     @Query("select count(u) from UserInfo  u where u.city = '四川'")
+     Integer sichuan();
+     @Query("select count(u) from UserInfo  u where u.city = '云南'")
+     Integer yunnan();
+     @Query("select count(u) from UserInfo  u where u.city = '贵州'")
+     Integer guizhou();
+     @Query("select count(u) from UserInfo  u where u.city = '西藏'")
+     Integer xizang();
+     @Query("select count(u) from UserInfo  u where u.city = '重庆'")
+     Integer chongqing();
+     @Query("select count(u) from UserInfo  u where u.city = '辽宁'")
+     Integer liaoning();
+     @Query("select count(u) from UserInfo  u where u.city = '吉林'")
+     Integer jilin();
+     @Query("select count(u) from UserInfo  u where u.city = '黑龙江'")
+     Integer heilongjiang();
+     @Query("select count(u) from UserInfo  u where u.city = '香港'")
+     Integer xianggang();
+     @Query("select count(u) from UserInfo  u where u.city = '澳门'")
+     Integer aomen();
+     @Query("select count(u) from UserInfo  u where u.city = '台湾'")
+     Integer taiwan();
+
+     @Query("select count(u) from UserInfo  u where u.vip = '1'")
+     Integer CountVip();
+     @Query("select count(u) from UserInfo  u where u.vip = '0'")
+     Integer CountNoVip();
 }

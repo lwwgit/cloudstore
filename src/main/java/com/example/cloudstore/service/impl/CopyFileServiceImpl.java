@@ -2,15 +2,19 @@ package com.example.cloudstore.service.impl;
 
 
 import com.example.cloudstore.controller.GlobalFunction;
+import com.example.cloudstore.domain.Md5;
+import com.example.cloudstore.repository.Md5Repository;
 import com.example.cloudstore.service.CopyFileService;
 import org.apache.hadoop.fs.*;
 import org.apache.hadoop.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.Date;
 
 @Service
 public class CopyFileServiceImpl implements CopyFileService {
@@ -19,6 +23,10 @@ public class CopyFileServiceImpl implements CopyFileService {
 
     @Autowired
     private GlobalFunction globalFunction;
+    @Autowired
+    private Md5Repository md5Repository;
+    @Value("${HDFS_PATH}")
+    private String HDFS_PATH;
 
 
     /**
@@ -70,6 +78,7 @@ public class CopyFileServiceImpl implements CopyFileService {
         FileSystem fs = globalFunction.getHadoopFileSystem();
 
         String filename = srcPath.substring(srcPath.lastIndexOf("/") + 1);
+        String oldFatherPath = srcPath.substring(0,srcPath.length()-filename.length()-1);
         String checkName = dstPath + "/" + filename;
         boolean checkResult = checkIsExist(checkName);
         if (checkResult == false) {
@@ -95,6 +104,16 @@ public class CopyFileServiceImpl implements CopyFileService {
 //                }
 //            }
             }
+            //向数据库中存入复制后的文件信息
+            Md5 byFileNameAndPath = md5Repository.findByFileNameAndPath(filename, oldFatherPath);
+            Md5 md51 = new Md5();
+            md51.setFileName(filename);
+            md51.setUsername(byFileNameAndPath.getUsername());
+            md51.setFileMd5(byFileNameAndPath.getFileMd5());
+            md51.setPath(dstPath);
+            md51.setCreateTime(new Date());
+            md5Repository.save(md51);
+
             return true;
         } else {
             return false;
@@ -117,10 +136,17 @@ public class CopyFileServiceImpl implements CopyFileService {
             boolean checkResult = checkIsExist(checkPath);//判断文件夹是否在目录下存在
             if (checkResult == false) {
                 fs.mkdirs(new Path(dsc + "/" + lastName));
+                Md5 md51 = new Md5();
+                md51.setUid("文件夹");
+                md51.setFileName(lastName);
+                md51.setFileMd5("");
+                md51.setPath(dsc);
+                md51.setCreateTime(new Date());
+                md5Repository.save(md51);
                 //遍历
                 FileStatus[] fileStatus = fs.listStatus(srcPath);
                 for (FileStatus fileSta : fileStatus) {
-                    copyDir(fileSta.getPath().toString(), dsc + "/" + lastName);
+                    copyDir(fileSta.getPath().toString().substring(HDFS_PATH.length()-1), dsc + "/" + lastName);
                 }
                 return true;
             }

@@ -5,6 +5,7 @@ import com.example.cloudstore.repository.Md5Repository;
 import com.example.cloudstore.service.Md5service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -15,6 +16,7 @@ import java.util.List;
  * @Description:
  */
 @Service
+@Transactional
 public class Md5serviceImpl implements Md5service {
     @Autowired
     private Md5Repository md5Repository;

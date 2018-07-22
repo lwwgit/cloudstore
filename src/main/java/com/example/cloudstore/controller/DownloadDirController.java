@@ -44,7 +44,7 @@ public class DownloadDirController {
                 response.setContentType("multipart/form-data");// 定义输出类型
                 FileInputStream fis = new FileInputStream(file);
                 BufferedInputStream buff = new BufferedInputStream(fis);
-                byte[] b = new byte[1024];// 相当于我们的缓存
+                byte[] b = new byte[1024 * 64];// 相当于我们的缓存
                 long k = 0;// 该值用于计算当前实际下载了多少字节
                 OutputStream myout = response.getOutputStream();// 从response对象中得到输出流,准备下载
                 // 开始循环下载
@@ -109,7 +109,7 @@ public class DownloadDirController {
                 response.setContentLength((int) file.length());
                 FileInputStream fis = new FileInputStream(file);
                 BufferedInputStream buff = new BufferedInputStream(fis);
-                byte[] b = new byte[1024];// 相当于我们的缓存
+                byte[] b = new byte[1024 * 64];// 相当于我们的缓存
                 long k = 0;// 该值用于计算当前实际下载了多少字节
                 OutputStream myout = response.getOutputStream();// 从response对象中得到输出流,准备下载
                 // 开始循环下载
