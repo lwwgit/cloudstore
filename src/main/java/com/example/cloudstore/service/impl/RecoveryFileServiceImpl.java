@@ -90,4 +90,9 @@ public class RecoveryFileServiceImpl implements RecoveryFileService {
     public RecoveryFile findByRecoveryId(Long recoveryId) {
         return recoveryFileRepository.findByRecoveryId(recoveryId);
     }
+
+    @Override
+    public RecoveryFile findByFileName(String fileName) {
+        return recoveryFileRepository.findByFileName(fileName);
+    }
 }
