@@ -48,7 +48,7 @@ public class FileSharedServiceImpl implements FileSharedService {
 
         GlobalFunction globalFunction = new GlobalFunction();
 
-        /*** 生成id ***/
+        //生成id
         String KeyString = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         StringBuffer sb = new StringBuffer();
         int len = KeyString.length();
@@ -56,7 +56,7 @@ public class FileSharedServiceImpl implements FileSharedService {
             sb.append(KeyString.charAt((int) Math.round(Math.random() * (len - 1))));
         }
 
-        /**** 判断是否需要分享密码并生成密码 ***/
+        //判断是否需要分享密码并生成密码
         String passwd = "-1";
         if (ifPasswd.equals("yes")) {
             String YesString = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -68,7 +68,7 @@ public class FileSharedServiceImpl implements FileSharedService {
             passwd = str.toString();
         }
 
-        /**** 连接文件系统 *****/
+        //连接文件系统
         FileSystem hdfs = null;
         Configuration config = new Configuration();
         config.set("fs.default.name", HdfsPath);
@@ -88,7 +88,7 @@ public class FileSharedServiceImpl implements FileSharedService {
         shareDetails.setIfPasswd(ifPasswd);
         shareDetails.setCharId(sb.toString());
         shareDetails.setFatherPath(fatherPath);
-        /***
+        /**
          * 测试的时候要更换name
          * **/
         shareDetails.setUsername(globalFunction.getUsername());
@@ -111,9 +111,9 @@ public class FileSharedServiceImpl implements FileSharedService {
         }
         //数据库存储分享总表shareDetails
         shareDetailsRepository.save(shareDetails);
-        /************************************************************************/
 
-        /************* 数据库存储详细表 file_shared *************/
+
+        // 数据库存储详细表 file_shared
         for (String path : paths) {
             Path newpath = new Path(path);
             FileStatus file = hdfs.getFileStatus(newpath);//获得单个文件的属性
@@ -148,7 +148,7 @@ public class FileSharedServiceImpl implements FileSharedService {
             fileShared.setLength(length);
             fileSharedRepository.save(fileShared);
         }
-        /****************************************************************/
+
         Map<String, Object> returnMap = new HashMap<>();
         returnMap.put("id", sb.toString());
         returnMap.put("passwd", passwd);
@@ -184,11 +184,9 @@ public class FileSharedServiceImpl implements FileSharedService {
         List<FileShared> list = fileSharedRepository.findAllByCharId(id);
         JsonShare jsonShare = new JsonShare();
         List<Map<String, Object>> returnList = new ArrayList<>();
-//        int existFile = 0;
         for (int i = 0; i < list.size(); i++) {
             //检查文件（夹）是否存在
             if (copyFileService.checkIsExist(list.get(i).getPath())) {
-//                existFile++;
 
                 Map<String, Object> childList = new HashMap<>();
                 childList.put("fileName", list.get(i).getFileName());
@@ -201,14 +199,9 @@ public class FileSharedServiceImpl implements FileSharedService {
                 returnList.add(childList);
 
             }
-//            else {
-//                jsonShare.setShareName("deleteFile");//分享总名称
-//            }
         }
 
         System.out.println("打印list.size: " + list.size());
-//        System.out.println("打印existFile: " + existFile);
-//        if (existFile != 0) {
         /***** 测试时修改name *****/
         ShareDetails shareDetails = shareDetailsRepository.findByCharId(id);
         String name = shareDetails.getUsername();
@@ -224,7 +217,6 @@ public class FileSharedServiceImpl implements FileSharedService {
         jsonShare.setType(shareDetails.getType());//分享总类型
         jsonShare.setFatherPath(shareDetails.getFatherPath());//分享列表的父目录
         jsonShare.setInfo(returnList);//分享总文件所包含的单个具体文件信息
-//        }
 
         //检查密码是否匹配
         String verifyPasswd = shareDetailsRepository.findByCharId(id).getPasswd();
