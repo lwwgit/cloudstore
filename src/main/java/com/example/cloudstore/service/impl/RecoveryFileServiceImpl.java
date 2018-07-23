@@ -141,7 +141,7 @@ public class RecoveryFileServiceImpl implements RecoveryFileService {
     }
 
     @Override
-    public RecoveryFile findByFileName(String fileName) {
-        return recoveryFileRepository.findByFileName(fileName);
+    public RecoveryFile findByPresentPath(String presentPath) {
+        return recoveryFileRepository.findByPresentPath(presentPath);
     }
 }
