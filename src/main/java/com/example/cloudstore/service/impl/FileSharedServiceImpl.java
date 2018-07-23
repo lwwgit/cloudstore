@@ -8,6 +8,7 @@ import com.example.cloudstore.domain.entity.UserInfo;
 import com.example.cloudstore.repository.FileSharedRepository;
 import com.example.cloudstore.repository.ShareDetailsRepository;
 import com.example.cloudstore.repository.UserInfoRepository;
+import com.example.cloudstore.service.CopyFileService;
 import com.example.cloudstore.service.FileSharedService;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
@@ -39,18 +40,15 @@ public class FileSharedServiceImpl implements FileSharedService {
     @Autowired
     UserInfoRepository userInfoRepository;
 
+    @Autowired
+    CopyFileService copyFileService;
+
     @Override
     public Map<String, Object> CreateSharedLink(String[] paths, String ifPasswd) throws URISyntaxException, IOException {
 
         GlobalFunction globalFunction = new GlobalFunction();
 
-        /**** 连接文件系统 *****/
-        FileSystem hdfs = null;
-        Configuration config = new Configuration();
-        config.set("fs.default.name", HdfsPath);
-        hdfs = FileSystem.get(new URI(HdfsPath), config);
-
-        /*** 生成id ***/
+        //生成id
         String KeyString = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         StringBuffer sb = new StringBuffer();
         int len = KeyString.length();
@@ -58,19 +56,48 @@ public class FileSharedServiceImpl implements FileSharedService {
             sb.append(KeyString.charAt((int) Math.round(Math.random() * (len - 1))));
         }
 
-        //获得第一个分享文件的属性
-        Path path0 = new Path(paths[0]);
-        FileStatus file0 = hdfs.getFileLinkStatus(path0);
-        String fp = file0.getPath().getParent().toString();
-        String fatherPath = fp.substring(fp.lastIndexOf("9000") + 4);
-        ShareDetails shareDetails = new ShareDetails();
-        shareDetails.setCharId(sb.toString());
-        /*** 测试的时候要更换name ****/
-        shareDetails.setUsername(globalFunction.getUsername());
-        shareDetails.setFatherPath(fatherPath);
-//        shareDetails.setUserName("lww");
+        //判断是否需要分享密码并生成密码
+        String passwd = "-1";
+        if (ifPasswd.equals("yes")) {
+            String YesString = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            StringBuffer str = new StringBuffer();
+            int strLen = YesString.length();
+            for (int i = 0; i < 4; i++) {
+                str.append(YesString.charAt((int) Math.round(Math.random() * (strLen - 1))));
+            }
+            passwd = str.toString();
+        }
 
-        //判断分享的文件数量，确定分享文件名和类型
+        //连接文件系统
+        FileSystem hdfs = null;
+        Configuration config = new Configuration();
+        config.set("fs.default.name", HdfsPath);
+        hdfs = FileSystem.get(new URI(HdfsPath), config);
+
+
+        /*********** 数据库存储总表shareDetails **********************************/
+        Path path0 = new Path(paths[0]);//获得第一个分享文件的属性
+        FileStatus file0 = hdfs.getFileLinkStatus(path0);
+        String fp = file0.getPath().getParent().toString();//字符串截取，获得父目录
+        String fatherPath = fp.substring(fp.lastIndexOf("9000") + 4);
+
+        ShareDetails shareDetails = new ShareDetails();
+
+        //shareDetails存入分享密码
+        shareDetails.setPasswd(passwd);
+        shareDetails.setIfPasswd(ifPasswd);
+        shareDetails.setCharId(sb.toString());
+        shareDetails.setFatherPath(fatherPath);
+        /**
+         * 测试的时候要更换name
+         * **/
+        shareDetails.setUsername(globalFunction.getUsername());
+//        shareDetails.setUsername("lww");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        String nowTime = formatter.format(new Date());//存入当前分享时间
+
+        shareDetails.setTime(nowTime);
+        //判断分享的文件数量，确定分享shareName和type
         int number = paths.length;
         shareDetails.setFileNum(number);
         if (number == 1) {
@@ -82,27 +109,11 @@ public class FileSharedServiceImpl implements FileSharedService {
             shareDetails.setShareName(file0.getPath().getName() + "等");
             shareDetails.setType("folder");
         }
-
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-        String nowTime = formatter.format(new Date());
-
-        /**** 判断是否需要分享密码并生成密码 ***/
-        String passwd = "-1";
-        if (ifPasswd.equals("yes")) {
-            String YesString = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-            StringBuffer str = new StringBuffer();
-            int strLen = YesString.length();
-            for (int i = 0; i < 4; i++) {
-                str.append(YesString.charAt((int) Math.round(Math.random() * (strLen - 1))));
-            }
-            passwd = str.toString();
-        }
-        //shareDetails存入分享密码
-        shareDetails.setPasswd(passwd);
-        shareDetails.setIfPasswd(ifPasswd);
-        shareDetails.setTime(nowTime);
+        //数据库存储分享总表shareDetails
         shareDetailsRepository.save(shareDetails);
 
+
+        // 数据库存储详细表 file_shared
         for (String path : paths) {
             Path newpath = new Path(path);
             FileStatus file = hdfs.getFileStatus(newpath);//获得单个文件的属性
@@ -135,7 +146,6 @@ public class FileSharedServiceImpl implements FileSharedService {
             fileShared.setPasswd(passwd);
             fileShared.setTime(nowTime);
             fileShared.setLength(length);
-
             fileSharedRepository.save(fileShared);
         }
 
@@ -170,40 +180,47 @@ public class FileSharedServiceImpl implements FileSharedService {
     }
 
     @Override
-    public JsonShare ToShare(String id, String passwd) {
+    public JsonShare ToShare(String id, String passwd) throws IOException {
         List<FileShared> list = fileSharedRepository.findAllByCharId(id);
+        JsonShare jsonShare = new JsonShare();
+        List<Map<String, Object>> returnList = new ArrayList<>();
+        for (int i = 0; i < list.size(); i++) {
+            //检查文件（夹）是否存在
+            if (copyFileService.checkIsExist(list.get(i).getPath())) {
 
-        ShareDetails shareDetails = shareDetailsRepository.findByCharId(id);
+                Map<String, Object> childList = new HashMap<>();
+                childList.put("fileName", list.get(i).getFileName());
+                childList.put("owner", list.get(i).getOwner());
+                childList.put("size", list.get(i).getSize());
+                childList.put("type", list.get(i).getType());
+                childList.put("path", list.get(i).getPath());
+                childList.put("time", list.get(i).getTime());
+                childList.put("len", list.get(i).getLength());
+                returnList.add(childList);
+
+            }
+        }
+
+        System.out.println("打印list.size: " + list.size());
         /***** 测试时修改name *****/
+        ShareDetails shareDetails = shareDetailsRepository.findByCharId(id);
         String name = shareDetails.getUsername();
-//        String name = "lww";
+//            String name = "lww";
 
         UserInfo userInfo = userInfoRepository.findByUsername(name);
 
-        JsonShare jsonShare = new JsonShare();
-        List<Map<String, Object>> returnList = new ArrayList<>();
+        jsonShare.setUsername(userInfo.getUsername());//分享者的名字
+        jsonShare.setVip(userInfo.getVip());//分享者的用户等级
+        jsonShare.setUserIntro(userInfo.getIntroduction());//分享者的个性签名
+        jsonShare.setShareName(shareDetails.getShareName());//分享总名称
+        jsonShare.setShareTime(shareDetails.getTime());//分享时间
+        jsonShare.setType(shareDetails.getType());//分享总类型
+        jsonShare.setFatherPath(shareDetails.getFatherPath());//分享列表的父目录
+        jsonShare.setInfo(returnList);//分享总文件所包含的单个具体文件信息
 
-        for (int i = 0; i < list.size(); i++) {
-            Map<String, Object> childList = new HashMap<>();
-            childList.put("fileName", list.get(i).getFileName());
-            childList.put("owner", list.get(i).getOwner());
-            childList.put("size", list.get(i).getSize());
-            childList.put("type", list.get(i).getType());
-            childList.put("path", list.get(i).getPath());
-            childList.put("time", list.get(i).getTime());
-            childList.put("len", list.get(i).getLength());
-            returnList.add(childList);
-        }
-        jsonShare.setUsername(userInfo.getUsername());
-        jsonShare.setVip(userInfo.getVip());
-        jsonShare.setUserIntro(userInfo.getIntroduction());
-        jsonShare.setShareName(shareDetails.getShareName());
-        jsonShare.setShareTime(shareDetails.getTime());
-        jsonShare.setType(shareDetails.getType());
-        jsonShare.setFatherPath(shareDetails.getFatherPath());
-        jsonShare.setInfo(returnList);
-        if (passwd.equals("-1") || passwd.equals(list.get(0).getPasswd())) {
-            System.out.println("打印jsonShare" + jsonShare);
+        //检查密码是否匹配
+        String verifyPasswd = shareDetailsRepository.findByCharId(id).getPasswd();
+        if (passwd.equals("-1") || passwd.equals(verifyPasswd)) {
             return jsonShare;
         } else {
             return null;
@@ -241,6 +258,15 @@ public class FileSharedServiceImpl implements FileSharedService {
             return "success";
         } else {
             return "fail";
+        }
+    }
+
+    @Override
+    public String IfSqlById(String id) {
+        if (shareDetailsRepository.findByCharId(id) == null) {
+            return "false";
+        } else {
+            return "true";
         }
     }
 }

@@ -4,12 +4,18 @@ import com.alipay.api.AlipayApiException;
 import com.example.cloudstore.repository.UserInfoRepository;
 import com.example.cloudstore.service.AlipayService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.View;
+import org.springframework.web.servlet.view.RedirectView;
 
 import java.io.UnsupportedEncodingException;
 
 @RestController
 public class AlipayController {
+
+    @Value("${WEB_IP}")
+    private String WEB_IP;
 
     @Autowired
     AlipayService alipayService;
@@ -17,30 +23,24 @@ public class AlipayController {
     @Autowired
     UserInfoRepository userInfoRepository;
 
-    @GetMapping(value = "/become/vip")
+    @GetMapping("/become/vip")
     public String PayVip() throws UnsupportedEncodingException, AlipayApiException {
-        return alipayService.PayVip();
+        String result = alipayService.PayVip();
+        System.out.println("Pay Return: " + result);
+        return result;
     }
 
     @GetMapping("/return_url")
-    public void ReturnUrl() throws UnsupportedEncodingException, AlipayApiException {
+    public View ReturnUrl() throws UnsupportedEncodingException, AlipayApiException {
+        System.out.println("Already in return_url");
         alipayService.Notify();
-        /*
-        *
-        * 这里调用alipayService.Notify()对数据库进行操作
-        * 应该在异步通知notify_url里进行调用
-        * 但异步通知需要公网ip
-        * 宝宝的本机不是公网
-        * 很无奈啊
-        * 哭~~~
-        *
-        * */
+        return new RedirectView(WEB_IP + "/#/home/all");
 
     }
 
     @PostMapping("/notify_url")
     public void NotifyUrl() throws UnsupportedEncodingException, AlipayApiException {
-        System.out.println("###### In notify_url");
+        System.out.println("Already in notify_url");
 //        alipayService.Notify();
     }
 }

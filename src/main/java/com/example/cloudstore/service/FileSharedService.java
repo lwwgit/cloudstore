@@ -15,9 +15,11 @@ public interface FileSharedService {
 
     List<ShareDetails> AllShare();
 
-    JsonShare ToShare(String id, String passwd);
+    JsonShare ToShare(String id, String passwd) throws IOException;
 
     String RemoveShare(String[] id);
 
     String Report(String id);
+
+    String IfSqlById(String id);
 }
