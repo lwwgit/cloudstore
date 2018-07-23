@@ -19,5 +19,7 @@ public interface ShareDetailsRepository extends JpaRepository<ShareDetails, Inte
     @Query("delete from ShareDetails sd where sd.charId=?1")
     void deleteByCharId(String charId);
 
+    List<ShareDetails> findByUsername(String username);
+
 
 }

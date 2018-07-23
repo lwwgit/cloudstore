@@ -52,13 +52,13 @@ public class PreviewOnlieController {
         if (extension.equals("xls")|| extension.equals("xlsx")){
             return excel2Pdf(input);
         }
-        if (extension.equals("c")|| extension.equals("java")|| extension.equals("txt")|| extension.equals("py")||extension.equals("cpp")){
+        if (extension.equals("c")|| extension.equals("java")|| extension.equals("txt")|| extension.equals("py")||extension.equals("cpp")||extension.equals("html")){
             return jc2Pdf(input);
         }
         if (extension.equals("pdf")){
             return pdf2Pdf(input);
         }
-        if (extension.equals("jpg")|| extension.equals("png")|| extension.equals("gif")|| extension.equals("bmp")){
+        if (extension.equals("jpg")|| extension.equals("JPG")|| extension.equals("png")|| extension.equals("gif")|| extension.equals("bmp")){
             return Img2Pdf(input);
         }
         jsonResult.setStatus("转换失败");

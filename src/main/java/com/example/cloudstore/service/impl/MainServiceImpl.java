@@ -406,7 +406,7 @@ public class MainServiceImpl implements MainService {
         if (type.equals("avi")|| type.equals("mov") || type.equals("swf")|| type.equals("mpg")|| type.equals("mp4")){
             return "video";
         }
-        if (type.equals("c")|| type.equals("java")|| type.equals("py")|| type.equals("cpp")|| type.equals("vue")){
+        if (type.equals("html")||type.equals("c")|| type.equals("java")|| type.equals("py")|| type.equals("cpp")|| type.equals("vue")){
             return "code";
         }
         if (type.equals("doc")|| type.equals("docx")){
