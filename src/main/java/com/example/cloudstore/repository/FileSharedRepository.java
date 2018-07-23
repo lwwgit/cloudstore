@@ -16,6 +16,11 @@ public interface FileSharedRepository extends JpaRepository<FileShared, String> 
 
     @Modifying
     @Transactional
+    @Query("delete from FileShared file where file.path=?1")
+    void deleteByPath(String path);
+
+    @Modifying
+    @Transactional
     @Query("delete from FileShared file where file.charId=?1")
     void deleteAllByCharId(String charId);
 

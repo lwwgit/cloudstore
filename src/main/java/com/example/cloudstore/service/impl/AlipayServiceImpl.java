@@ -6,10 +6,13 @@ import com.alipay.api.DefaultAlipayClient;
 import com.alipay.api.internal.util.AlipaySignature;
 import com.alipay.api.request.AlipayTradePagePayRequest;
 import com.example.cloudstore.authentication.provider.AlipayConfig;
+import com.example.cloudstore.controller.GlobalFunction;
 import com.example.cloudstore.domain.entity.OrderInfo;
 import com.example.cloudstore.domain.entity.UserInfo;
+import com.example.cloudstore.domain.entity.UserStore;
 import com.example.cloudstore.repository.OrderInfoRepository;
 import com.example.cloudstore.repository.UserInfoRepository;
+import com.example.cloudstore.repository.UserStoreRepository;
 import com.example.cloudstore.service.AlipayService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,15 +35,18 @@ public class AlipayServiceImpl implements AlipayService {
     UserInfoRepository userInfoRepository;
 
     @Autowired
+    UserStoreRepository userStoreRepository;
+
+    @Autowired
     HttpServletRequest request;
 
     @Override
     public String PayVip() throws UnsupportedEncodingException, AlipayApiException {
-//        GlobalFunction globalFunction = new GlobalFunction();
-//        String username = globalFunction.getUsername();
-        String username = "ccc";
+        GlobalFunction globalFunction = new GlobalFunction();
+        String username = globalFunction.getUsername();
+//        String username = "shw";
         UserInfo userInfo = userInfoRepository.findByUsername(username);
-        if (userInfo.getVip().equals("0")){
+        if (userInfo.getVip().equals("1")) {
             return "Already Vip";
         }
         //获得初始化的AlipayClient
@@ -55,12 +61,11 @@ public class AlipayServiceImpl implements AlipayService {
         String nowTime = formatter.format(new Date());
 
         //订单Id，格式username&&nowTime
-        String out_trade_no = "用户：" + username + "  交易时间：" + nowTime;
+        String out_trade_no = "UserId=" + userInfo.getId()+ "  TradeTime=" + nowTime;
         //订单Name，格式username&&nowTime&&month
-        String subject = "用户名：" + username + "  交易时间：" + nowTime;
+        String subject = "User=" + userInfo.getId() + "  TradeTime=" + nowTime;
         //订单金额，格式month*10
         String total_amount = "200";
-
 
 //        //订单号，必填
 //        String out_trade_no = new String(orderId.getBytes("ISO-8859-1"), "UTF-8");
@@ -82,11 +87,10 @@ public class AlipayServiceImpl implements AlipayService {
 
     @Override
     public void Notify() throws UnsupportedEncodingException, AlipayApiException {
-
-//        GlobalFunction globalFunction = new GlobalFunction();
-//        String username = globalFunction.getUsername();
-        String username = "ccc";
-
+        GlobalFunction globalFunction = new GlobalFunction();
+        String username = globalFunction.getUsername();
+//        String username = "shw";
+//获取支付宝返回过来的信息
         Map<String, String> params = new HashMap<String, String>();
         Map<String, String[]> requestParams = request.getParameterMap();
         for (Iterator<String> iter = requestParams.keySet().iterator(); iter.hasNext(); ) {
@@ -101,7 +105,7 @@ public class AlipayServiceImpl implements AlipayService {
             valueStr = new String(valueStr.getBytes("ISO-8859-1"), "utf-8");
             params.put(name, valueStr);
         }
-
+        System.out.println("params: " + params + "\n requestParams: " + requestParams);
         boolean signVerified = AlipaySignature.rsaCheckV1(params, AlipayConfig.alipay_public_key,
                 AlipayConfig.charset, AlipayConfig.sign_type); //调用SDK验证签名
 
@@ -110,14 +114,25 @@ public class AlipayServiceImpl implements AlipayService {
             OrderInfo orderInfo = new OrderInfo();
             String alipayNo = request.getParameter("out_trade_no");
             String money = request.getParameter("total_amount");
+
+            System.out.println("alipayNo: " + alipayNo + "money: " + money);
+
             orderInfo.setAlipayNo(alipayNo);
             orderInfo.setMoney(money);
             orderInfoRepository.save(orderInfo);
+            System.out.println("订单信息打印：" + orderInfo);
 
             //修改用户信息为vip
             UserInfo userInfo = userInfoRepository.findByUsername(username);
-            userInfo.setVip("0");
+            userInfo.setVip("1");
             userInfoRepository.save(userInfo);
+
+            UserStore userStore = userStoreRepository.findByUsername(username);
+            userStore.setAvailableCapacity("5GB");
+            userStoreRepository.save(userStore);
+        } else {
+            System.out.println("验签未通过");
+            System.out.println("验签为： " + signVerified);
         }
     }
 }

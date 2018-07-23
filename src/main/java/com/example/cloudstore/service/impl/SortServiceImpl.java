@@ -185,7 +185,7 @@ public class SortServiceImpl implements SortService {
             //获取length, size, availableCapacity这些变量
             long length = 0;
             for (int i = 0; i < list.size(); i++) {
-                length += Long.valueOf(list.get(i).get("length").toString());
+                length += Long.valueOf(list.get(i).get("len").toString());
             }
 //            totalLength += length;
             String size = globalFunction.getFileSize(length);

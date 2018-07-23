@@ -1,6 +1,5 @@
 package com.example.cloudstore.controller;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
@@ -57,7 +56,7 @@ public class GlobalFunction {
          * 因为宝宝也不知道
          **/
         System.out.println("全局函数: " + path);
-        String HADOOP_URL = "hdfs://192.168.220.137:9000/";
+        String HADOOP_URL = "hdfs://192.168.220.142:9000/";
         FileSystem hdfs = null;
         Configuration config = new Configuration();
         // 程序配置
