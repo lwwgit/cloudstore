@@ -110,7 +110,7 @@ public class PreviewOnlieController {
             }else {
                 FSDataInputStream HDFS_IN = fileSystem.open(inputPath);
                 OutputStream OutToLOCAL = new FileOutputStream(localName + input.substring(input.lastIndexOf("/") + 1));
-                IOUtils.copyBytes(HDFS_IN, OutToLOCAL, 1024, true);
+                IOUtils.copyBytes(HDFS_IN, OutToLOCAL, 1024 * 64, true);
                 String fileName = input.substring(input.lastIndexOf("/") + 1);
                 String fileSuffix = fileName.substring(fileName.lastIndexOf(".")+1);
                 System.out.println(fileSuffix);
@@ -151,7 +151,7 @@ public class PreviewOnlieController {
             }else {
                 FSDataInputStream HDFS_IN = fileSystem.open(inputPath);
                 OutputStream OutToLOCAL = new FileOutputStream(localName + input.substring(input.lastIndexOf("/") + 1));
-                IOUtils.copyBytes(HDFS_IN, OutToLOCAL, 1024, true);
+                IOUtils.copyBytes(HDFS_IN, OutToLOCAL, 1024 * 1024, true);
                 String fileName = input.substring(input.lastIndexOf("/") + 1);
                 String fileSuffix = fileName.substring(fileName.lastIndexOf(".")+1);
                 System.out.println(fileSuffix);
@@ -194,7 +194,7 @@ public class PreviewOnlieController {
             }else {
                 FSDataInputStream HDFS_IN = fileSystem.open(inputPath);
                 OutputStream OutToLOCAL = new FileOutputStream(localName + input.substring(input.lastIndexOf("/") + 1));
-                IOUtils.copyBytes(HDFS_IN, OutToLOCAL, 1024, true);
+                IOUtils.copyBytes(HDFS_IN, OutToLOCAL, 1024 * 64, true);
                 File file = new File(localName+input.substring(input.lastIndexOf("/") + 1));
                 String newName = Name + ".txt";
                 File newfile = new File(localName+newName);
@@ -234,7 +234,7 @@ public class PreviewOnlieController {
             }else {
                 OutputStream OutToLOCAL = new FileOutputStream(localName + input.substring(input.lastIndexOf("/") + 1));
                 FSDataInputStream HDFS_IN = fileSystem.open(inputPath);
-                IOUtils.copyBytes(HDFS_IN, OutToLOCAL, 1024, true);
+                IOUtils.copyBytes(HDFS_IN, OutToLOCAL, 1024 * 64, true);
 
                 String fileName = input.substring(input.lastIndexOf("/") + 1);
                 String fileSuffix = fileName.substring(fileName.lastIndexOf(".")+1);
@@ -275,7 +275,7 @@ public class PreviewOnlieController {
                 FSDataInputStream HDFS_IN = fileSystem.open(inputPath);
                 String fileName = time+".pdf";
                 OutputStream OutToLOCAL = new FileOutputStream(localName + fileName);
-                IOUtils.copyBytes(HDFS_IN, OutToLOCAL, 1024, true);
+                IOUtils.copyBytes(HDFS_IN, OutToLOCAL, 1024 * 64, true);
                 result.setStatus("预览成功");
                 result.setResult(PC_PATH+"/upload/" + fileName);
                 HDFS_IN.close();

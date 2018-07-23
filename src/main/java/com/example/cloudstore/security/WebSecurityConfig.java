@@ -31,7 +31,7 @@ import javax.sql.DataSource;
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
     @Autowired
@@ -46,14 +46,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private MyAuthenticationFailureHandler myAuthenticationFailureHandler;
     @Autowired
     private SmsCodeAuthenticationSecurityConfig smsCodeAuthenticationSecurityConfig;
-
     @Bean
-    public PasswordEncoder passwordEncoder() {
+    public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
-
     @Bean
-    public PersistentTokenRepository persistentTokenRepository() {
+    public PersistentTokenRepository persistentTokenRepository(){
         JdbcTokenRepositoryImpl tokenRepository = new JdbcTokenRepositoryImpl();
         tokenRepository.setDataSource(dataSource);
         //数据库不存在的时候需要下面这句代码
@@ -77,38 +75,32 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
         http.addFilter(new JWTAuthenticationFilter(authenticationManager()));
 
-        http.addFilterBefore(validateCodeFilter, UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(smsCodeFilter, UsernamePasswordAuthenticationFilter.class)
+        http.addFilterBefore(validateCodeFilter,UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(smsCodeFilter,UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
                 .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
                 // 如果有允许匿名的url，填在下面
-                .antMatchers("/code/**", "/forget/password", "/user/check", "/register/**", "/icon/get", "/upload/**", "/break/**", "/privateSpace/**", "/user/icon/upload",
-                        "/home/share", "/home/share/goto", "/home/share/report",
-                        "/become/vip", "/return_url").permitAll()
+                .antMatchers("/code/**","/break/**","/forget/password","/user/check","/register/**","/swagger-ui.html","/login.html","/upload/**","/Admin/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 // 设置登陆页
                 .formLogin()//表单登录 .httpBasic是另一种登录方式
-                .loginPage("/loginPage")
-                .loginProcessingUrl("/authentication/login")//form表单提交的路径，默认是'/login'
+                    .loginPage("/loginPage")
+                    .loginProcessingUrl("/authentication/login")//form表单提交的路径，默认是'/login'
 //                    .successForwardUrl("/login/success")
 //                    .failureUrl("/login/error")
-                .successHandler(myAuthenticationSuccessHandler)//返回的是json串
-                .failureHandler(myAuthenticationFailureHandler)
+                    .successHandler(myAuthenticationSuccessHandler)//返回的是json串
+                    .failureHandler(myAuthenticationFailureHandler)
+                    .permitAll()
+                    .and()
+                .logout().logoutUrl("/logout")
                 .permitAll()
                 .and()
-//                .logout().logoutUrl("/logout")
-//                .permitAll()
-//                .and()
                 .rememberMe()
-                .rememberMeParameter("remember_me")
-                .tokenRepository(persistentTokenRepository())
-                .tokenValiditySeconds(3600)
-                .userDetailsService(userDetailsService);
-        http.authorizeRequests()
-                .and()
-                .logout().logoutUrl("/logout")
-                .permitAll();
+                    .rememberMeParameter("remember_me")
+                    .tokenRepository(persistentTokenRepository())
+                    .tokenValiditySeconds(3600)
+                    .userDetailsService(userDetailsService);
 
 
 // 关闭CSRF（Cross-site request forgery）跨站请求伪造
@@ -121,7 +113,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(WebSecurity web) throws Exception {
         // 设置拦截忽略文件夹，可以对静态资源放行
-        web.ignoring().antMatchers("/css/**", "/js/**", "/img/**");
+        web.ignoring().antMatchers("/css/**", "/js/**","/img/**");
     }
 }
 

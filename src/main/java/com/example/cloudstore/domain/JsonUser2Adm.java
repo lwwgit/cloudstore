@@ -9,6 +9,34 @@ public class JsonUser2Adm {
     private String state;
     private String com;
     private String create_date;
+    private String totalsize;
+    private String usedsize;
+    private Float usedInfo;
+
+
+    public Float getUsedInfo() {
+        return usedInfo;
+    }
+
+    public void setUsedInfo(Float usedInfo) {
+        this.usedInfo = usedInfo;
+    }
+
+    public String getTotalsize() {
+        return totalsize;
+    }
+
+    public void setTotalsize(String totalsize) {
+        this.totalsize = totalsize;
+    }
+
+    public String getUsedsize() {
+        return usedsize;
+    }
+
+    public void setUsedsize(String usedsize) {
+        this.usedsize = usedsize;
+    }
 
     public String getState() {
         return state;

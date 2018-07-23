@@ -14,6 +14,7 @@ public class HDFS_Downloader
 
     //TODO 此处下面需要更改hdfs地址
 
+
     public static FileSystem hdfs;
 
     public static void downloadFile(String srcPath, String dstPath) throws Exception
@@ -24,7 +25,7 @@ public class HDFS_Downloader
         {
             in = hdfs.open(new Path(srcPath));
             out = new FileOutputStream(dstPath);
-            IOUtils.copyBytes(in, out, 4096, false);
+            IOUtils.copyBytes(in, out, 1024 * 64, false); //原来是4096
         }
         finally
         {
