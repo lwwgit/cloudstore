@@ -14,10 +14,13 @@ import java.util.Date;
 @Entity
 public class Md5 {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Integer id;
 
     private String uid;
+
+    private String username;
+
     private String path;
 
     private String fileName;
@@ -29,6 +32,14 @@ public class Md5 {
 
 //    @Column(name = "update_time")
     private Date updateTime;
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
     public Integer getId() {
         return id;

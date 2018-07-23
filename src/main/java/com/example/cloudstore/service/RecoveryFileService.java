@@ -41,4 +41,6 @@ public interface RecoveryFileService {
 
     RecoveryFile findByRecoveryId(Long recoveryId);
 
+    RecoveryFile findByFileName(String fileName);
+
 }

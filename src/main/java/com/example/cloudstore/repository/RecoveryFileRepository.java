@@ -11,4 +11,6 @@ public interface RecoveryFileRepository extends JpaRepository<RecoveryFile,Long>
     List<RecoveryFile> findByUsername(String username);
 
     RecoveryFile findByRecoveryId(Long recoveryId);
+
+    RecoveryFile findByFileName(String fileName);
 }

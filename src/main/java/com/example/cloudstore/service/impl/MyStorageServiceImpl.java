@@ -1,6 +1,7 @@
 package com.example.cloudstore.service.impl;
 
 
+import com.example.cloudstore.controller.GlobalFunction;
 import com.example.cloudstore.domain.Constants;
 import com.example.cloudstore.domain.Md5;
 import com.example.cloudstore.domain.MultipartFileParam;
@@ -9,6 +10,7 @@ import com.example.cloudstore.service.Md5service;
 import com.example.cloudstore.service.MyStorageService;
 import com.example.cloudstore.utils.FileMD5Util;
 
+import com.example.cloudstore.utils.GetUserInfoUtil;
 import net.bytebuddy.asm.Advice;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -19,6 +21,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -28,7 +32,9 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 /**
  * @Author jitdc
@@ -114,7 +120,7 @@ public class MyStorageServiceImpl implements MyStorageService {
     }
 
     @Override
-    public void uploadFileByMappedByteBuffer(MultipartFileParam param) throws Exception {
+    public void uploadFileByMappedByteBuffer(MultipartFileParam param, String username,String path) throws Exception {
         String fileName = param.getName();
         String temp = finalDirPath + "/"+param.getName();
         String uploadDirPath = StringUtils.substringBefore(temp, ".");
@@ -145,25 +151,58 @@ public class MyStorageServiceImpl implements MyStorageService {
             boolean flag = renameFile(tmpFile, fileName);
             if (flag)
                 System.out.println("重命名成功了！");
+            Md5 byFileNameAndPath = md5Repository.findByFileNameAndPath(fileName, path);
+            if (byFileNameAndPath != null){
+                File file = new File(uploadDirPath+"/"+fileName);
+                Integer tmp;
+                String tempDirName = "";
+                for (int i=0;i<4;i++) {
+                    tmp = new Random().nextInt(10);
+                    tempDirName = tempDirName+String.valueOf(tmp);
+                }
+                fileName = tempDirName+"-"+fileName;
+                boolean b = renameFile(file, fileName);
+                if (b)
+                    System.out.println("副本文件重命名成功！");
+            }
             File file = new File(uploadDirPath+"/"+fileName);
             if (file.exists()){
-                List<Md5> tmps = md5service.findByMd5AndFilename(param.getMd5(), param.getName());
-                if (tmps.size() == 1){
-                    String uploadPath = "";
-                    for (Md5 md5:tmps){
-                        uploadPath = md5.getPath();
-                    }
-                    System.out.println("上传到hdfs上的地址是："+uploadPath);
-                    uploadToHdfsService.uploadHdfs(uploadDirPath+"/"+fileName,uploadPath);
-                }
-                else
-                    System.out.println("该文件可能已上传过了，按规定不应该再上传了 ");
-
+ //               List<Md5> tmps = md5Repository.findByFileMd5AndFileNameAndUsername(param.getMd5(), param.getName(),username);
+//                if (tmps.size() > 1){
+//                    Integer number = tmps.size();
+//                    for (Md5 md5:tmps){
+//                        if (number == 1)
+//                            break;
+//                        else {
+//                            md5Repository.deleteById(md5.getId());
+//                            number--;
+//                        }
+//                    }
+//                }
+//                List<Md5> tmpss = md5Repository.findByFileMd5AndFileNameAndUsername(param.getMd5(), param.getName(),username);
+//                if (tmpss.size() == 1){
+//                    String uploadPath = "";
+//                    for (Md5 md5:tmpss){
+//                        uploadPath = md5.getPath();
+//                    }
+                    System.out.println("上传到hdfs上的地址是："+path);
+                    uploadToHdfsService.uploadHdfs(uploadDirPath+"/"+fileName,path);
+                    Md5 md51 = new Md5();
+                    md51.setUid(param.getUid());
+                    md51.setUsername(username);
+                    md51.setFileName(fileName);
+                    md51.setFileMd5(param.getMd5());
+                    md51.setPath(path);
+                    md51.setCreateTime(new Date());
+                    md5Repository.save(md51);
+                    deleteDirectory(uploadDirPath);
+//                }
+//                else
+//                    System.out.println("该文件可能已上传过了，按规定不应该再上传了 ");
             }
-
             else
                 System.out.println("文件出错了！");
-            deleteDirectory(uploadDirPath);
+
             System.out.println("upload complete !!" + flag + " name=" + fileName);
         }
 

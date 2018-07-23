@@ -88,10 +88,12 @@ public class RecoveryFileController {
         String dstPath = "/" + username + "tmp/";//该用户回收站目录
         for(String oriPath:oriPaths){
             recoveryFileService.MoveToRecovery(oriPath,dstPath);
-
-            //将文件或目录源路径插入数据库
-            RecoveryFile recoveryFile = new RecoveryFile();
             String filename = oriPath.substring(oriPath.lastIndexOf("/") + 1);
+            RecoveryFile recoveryFile = recoveryFileService.findByFileName(filename);
+            if(recoveryFile == null) {
+                recoveryFile = new RecoveryFile();
+            }
+            //将文件或目录源路径插入数据库
             if(oriPath.lastIndexOf(".") == -1){
                 recoveryFile.setType("folder");
             }else{
@@ -99,13 +101,11 @@ public class RecoveryFileController {
                 String fileType = globalFunction.getFileType(suffixName);
                 recoveryFile.setType(fileType);
             }
-
             Path path = new Path(dstPath + filename);
             FileStatus file = globalFunction.getHadoopFileSystem().getFileStatus(path);
             recoveryFile.setLen(file.getLen());
             recoveryFile.setDelTime(formatter.format(file.getModificationTime()));
             recoveryFile.setSize(globalFunction.getFileSize(file.getLen()));
-
             recoveryFile.setOriginalPath(oriPath);
             recoveryFile.setUsername(username);
             recoveryFile.setPresentPath(dstPath + filename);
