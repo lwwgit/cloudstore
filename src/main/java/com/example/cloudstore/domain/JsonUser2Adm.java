@@ -4,15 +4,42 @@ public class JsonUser2Adm {
     private Integer id;
     private String username;
     private String sex;
-    private String vip;
+    private Integer vip;
+    private Integer age;
     private String city;
-    private String state;
-    private String com;
+    private Integer state;
+    private String stateStr;
     private String create_date;
     private String totalsize;
     private String usedsize;
     private Float usedInfo;
+    private String introduction;
+    private String mobile;
 
+
+    public String getMobile() {
+        return mobile;
+    }
+
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
+    }
+
+    public String getIntroduction() {
+        return introduction;
+    }
+
+    public void setIntroduction(String introduction) {
+        this.introduction = introduction;
+    }
+
+    public String getStateStr() {
+        return stateStr;
+    }
+
+    public void setStateStr(String stateStr) {
+        this.stateStr = stateStr;
+    }
 
     public Float getUsedInfo() {
         return usedInfo;
@@ -38,20 +65,12 @@ public class JsonUser2Adm {
         this.usedsize = usedsize;
     }
 
-    public String getState() {
+    public Integer getState() {
         return state;
     }
 
-    public void setState(String state) {
+    public void setState(Integer state) {
         this.state = state;
-    }
-
-    public String getCom() {
-        return com;
-    }
-
-    public void setCom(String com) {
-        this.com = com;
     }
 
     public Integer getId() {
@@ -70,11 +89,11 @@ public class JsonUser2Adm {
         this.username = username;
     }
 
-    public String getVip() {
+    public Integer getVip() {
         return vip;
     }
 
-    public void setVip(String vip) {
+    public void setVip(Integer vip) {
         this.vip = vip;
     }
 
@@ -100,5 +119,13 @@ public class JsonUser2Adm {
 
     public void setCreate_date(String create_date) {
         this.create_date = create_date;
+    }
+
+    public Integer getAge() {
+        return age;
+    }
+
+    public void setAge(Integer age) {
+        this.age = age;
     }
 }

@@ -12,6 +12,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,13 +21,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.awt.print.Pageable;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
 
 @RestController
-@RequestMapping("/Admin")
 public class AdminController {
+
+    @Value("${HDFS_PATH}")
+    private String HDFS_PATH;
+
 
     @Autowired
     private AdminService adminService;
@@ -43,12 +48,21 @@ public class AdminController {
         return jsonResult;
     }
 
-    @ApiOperation(value = "登录上来就可以查看到的用户列表", notes = "用户的基本信息和文件夹")
-    @PostMapping("/infoDisplay")
+    @ApiOperation(value = "(分页)登录上来就可以查看到的用户列表", notes = "用户的基本信息和文件夹")
+    @PostMapping("/infoDisplayPage")
     public JsonResult InfoDisplay(@RequestParam Integer currentPage, @RequestParam Integer pageSize) {
         JsonResult jsonResult = new JsonResult();
         PageRequest pageable =  PageRequest.of(currentPage,pageSize);
         jsonResult.setResult(adminService.UserDisplay(pageable));
+        return jsonResult;
+    }
+
+    @ApiOperation(value = "登录上来就可以查看到的用户列表", notes = "用户的基本信息和文件夹")
+    @PostMapping("/infoDisplay")
+    public JsonResult InfoDisplay() throws URISyntaxException {
+        JsonResult jsonResult = new JsonResult();
+        jsonResult.setResult(adminService.InfoDisplay());
+        jsonResult.setStatus("查看成功");
         return jsonResult;
     }
 
@@ -65,7 +79,7 @@ public class AdminController {
 
     @ApiOperation(value = "查看vip用户信息", notes = "vip用户的基本信息和文件夹")
     @PostMapping("/vipInfoDisplay")
-    public JsonResult VipInfoDisplay() {
+    public JsonResult VipInfoDisplay() throws IOException,URISyntaxException{
         JsonResult jsonResult = new JsonResult();
         List<JsonUser2Adm> jsonUser2Adms= adminService.vipInfoDisPlay();
         jsonResult.setResult(jsonUser2Adms);
@@ -75,7 +89,7 @@ public class AdminController {
 
     @ApiOperation(value = "查看非vip用户信息", notes = "非vip用户的基本信息和文件夹")
     @PostMapping("/noVipInfoDisplay")
-    public JsonResult NoVipInfoDisplay() {
+    public JsonResult NoVipInfoDisplay() throws IOException,URISyntaxException {
         JsonResult jsonResult = new JsonResult();
         List<JsonUser2Adm> jsonUser2Adms= adminService.novipInfoDisPlay();
         jsonResult.setResult(jsonUser2Adms);
@@ -162,7 +176,7 @@ public class AdminController {
             public void run() {
                 Configuration conf=new Configuration();
                 try{
-                    URI uri = new URI("hdfs://192.168.150.134:9000/");
+                    URI uri = new URI(HDFS_PATH);
                     FileSystem hdfs = FileSystem.get(uri,conf);
                     Path delef = new Path(path);
                     //递归删除
@@ -189,7 +203,7 @@ public class AdminController {
     public JsonResult areaDistribution(){
         JsonResult jsonResult = new JsonResult();
         jsonResult.setStatus("获得数据成功");
-        jsonResult.setResult(adminService.cityDistribution());
+        jsonResult.setResult(adminService.areaData());
         return jsonResult;
     }
 
@@ -211,5 +225,28 @@ public class AdminController {
         return jsonResult;
     }
 
+    @PostMapping("/userReport")
+    public JsonResult userReport(){
+        JsonResult jsonResult = new JsonResult();
+        jsonResult.setStatus("获得数据成功");
+        jsonResult.setResult(adminService.userReport());
+        return jsonResult;
+    }
+
+    @PostMapping("/countData")
+    public JsonResult countData(){
+        JsonResult jsonResult = new JsonResult();
+        jsonResult.setStatus("获得数据成功");
+        jsonResult.setResult(adminService.CountData());
+        return jsonResult;
+    }
+
+    @PostMapping("/subFailure")
+    public JsonResult subFailure(String username){
+        JsonResult jsonResult = new JsonResult();
+        jsonResult.setStatus("修改成功");
+        jsonResult.setResult(adminService.subFailure(username));
+        return jsonResult;
+    }
 
 }

@@ -16,6 +16,8 @@ public interface SysUserRepository extends JpaRepository<SysUser,Integer> {
 
     SysUser findByUsername(String username);
 
+    SysUser findSysUserById(Integer id);
+
     SysUser findByTel(String tel);
 
     @Override
@@ -43,4 +45,12 @@ public interface SysUserRepository extends JpaRepository<SysUser,Integer> {
     @Transactional
     @Query("Update SysUser  s Set s.com = 0 where s.username = ?1")
     int comCan(String username);
+
+    @Query("select count(s) from SysUser s ")
+    Integer countUser();
+
+    @Modifying
+    @Transactional
+    @Query("Update SysUser  s Set s.com = 2 where s.username = ?1")
+    int subFailure(String username);
 }
