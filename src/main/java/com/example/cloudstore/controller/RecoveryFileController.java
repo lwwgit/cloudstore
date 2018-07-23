@@ -89,7 +89,8 @@ public class RecoveryFileController {
         for(String oriPath:oriPaths){
             recoveryFileService.MoveToRecovery(oriPath,dstPath);
             String filename = oriPath.substring(oriPath.lastIndexOf("/") + 1);
-            RecoveryFile recoveryFile = recoveryFileService.findByFileName(filename);
+            String check = dstPath + filename;
+            RecoveryFile recoveryFile = recoveryFileService.findByPresentPath(check);
             if(recoveryFile == null) {
                 recoveryFile = new RecoveryFile();
             }
