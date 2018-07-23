@@ -17,6 +17,10 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.DecimalFormat;
 
+/**
+ * getDirectorySize函数里需要重新声明一下文件系统的地址
+ * **/
+
 @Component
 public class GlobalFunction {
 
@@ -52,8 +56,6 @@ public class GlobalFunction {
         /**
          * 这里必须重新声明一下HADOOP_URL
          * 不然识别不出来
-         * 不要问我为什么
-         * 因为宝宝也不知道
          **/
         System.out.println("全局函数: " + path);
         String HADOOP_URL = "hdfs://192.168.220.142:9000/";
