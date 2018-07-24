@@ -104,6 +104,9 @@ public class FileSharedServiceImpl implements FileSharedService {
             shareDetails.setShareName(file0.getPath().getName());
             String fileType = file0.getPath().getName().substring(file0.getPath().getName().lastIndexOf(".") + 1);
             shareDetails.setType(globalFunction.getFileType(fileType));
+            if (file0.isDirectory()){
+                shareDetails.setType("folder");
+            }
         }
         if (number > 1) {
             shareDetails.setShareName(file0.getPath().getName() + "等");
