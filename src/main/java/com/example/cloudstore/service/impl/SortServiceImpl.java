@@ -1,7 +1,10 @@
 package com.example.cloudstore.service.impl;
 
 import com.example.cloudstore.controller.GlobalFunction;
+import com.example.cloudstore.domain.JsonSort;
+import com.example.cloudstore.domain.entity.UserInfo;
 import com.example.cloudstore.domain.entity.UserStore;
+import com.example.cloudstore.repository.UserInfoRepository;
 import com.example.cloudstore.repository.UserStoreRepository;
 import com.example.cloudstore.service.SortService;
 import org.apache.commons.lang3.StringUtils;
@@ -28,6 +31,9 @@ public class SortServiceImpl implements SortService {
 
     @Autowired
     UserStoreRepository userStoreRepository;
+
+    @Autowired
+    UserInfoRepository userInfoRepository;
 
     @Value("${HDFS_PATH}")
     private String HdfsPath;
@@ -145,7 +151,7 @@ public class SortServiceImpl implements SortService {
     }
 
     @Override
-    public List<Map<String, Object>> SortCapacity() throws IOException, URISyntaxException {
+    public JsonSort SortCapacity() throws IOException, URISyntaxException {
 
         GlobalFunction globalFunction = new GlobalFunction();
 
@@ -207,7 +213,7 @@ public class SortServiceImpl implements SortService {
 //        System.out.println("大小返回1： " + globalFunction.getDirectorySize("/" + username));
         long totalLength = Long.valueOf(globalFunction.getDirectorySize("/" + username));
 //        System.out.println("get totalLength: " + totalLength);
-       /*****************/
+        /*****************/
         //计算和添加所有已用类型的总数据
 
         String totalSize = globalFunction.getFileSize(totalLength);
@@ -235,8 +241,21 @@ public class SortServiceImpl implements SortService {
                 returnList.get(j).put("laterScale", laterScale);
             }
         }
+        UserInfo userInfo = userInfoRepository.findByUsername(username);
+        String isVip = userInfo.getVip();
+        String vip = null;
+        if (isVip.equals("1")) {
+            vip = "true";
+        }
+        if (isVip.equals("0")) {
+            vip = "false";
+        }
 
-        return returnList;
+        JsonSort jsonSort = new JsonSort();
+        jsonSort.setIsVip(vip);
+        jsonSort.setDataList(returnList);
+
+        return jsonSort;
     }
 
 }
