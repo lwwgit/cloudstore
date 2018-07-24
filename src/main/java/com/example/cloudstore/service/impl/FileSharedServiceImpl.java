@@ -8,6 +8,7 @@ import com.example.cloudstore.domain.entity.UserInfo;
 import com.example.cloudstore.repository.FileSharedRepository;
 import com.example.cloudstore.repository.ShareDetailsRepository;
 import com.example.cloudstore.repository.UserInfoRepository;
+import com.example.cloudstore.service.AdminService;
 import com.example.cloudstore.service.CopyFileService;
 import com.example.cloudstore.service.FileSharedService;
 import org.apache.hadoop.conf.Configuration;
@@ -42,6 +43,9 @@ public class FileSharedServiceImpl implements FileSharedService {
 
     @Autowired
     CopyFileService copyFileService;
+
+    @Autowired
+    AdminService adminService;
 
     @Override
     public Map<String, Object> CreateSharedLink(String[] paths, String ifPasswd) throws URISyntaxException, IOException {
@@ -179,7 +183,10 @@ public class FileSharedServiceImpl implements FileSharedService {
 
     @Override
     public List<ShareDetails> AllShare() {
-        return shareDetailsRepository.findAll();
+
+        GlobalFunction globalFunction = new GlobalFunction();
+        String username = globalFunction.getUsername();
+        return shareDetailsRepository.findAllByUsername(username);
     }
 
     @Override
@@ -255,6 +262,15 @@ public class FileSharedServiceImpl implements FileSharedService {
         reportNum = reportNum + 1;
         shareDetails.setReport(reportNum);
         shareDetailsRepository.save(shareDetails);
+
+        List<ShareDetails> list = shareDetailsRepository.findAllByUsername(shareDetails.getUsername());
+        int n = 0;
+        for (int i = 0; i < list.size(); i ++){
+            n = n + list.get(i).getReport();
+        }
+        if (n > 20){
+            adminService.modeFreeze(shareDetails.getUsername());
+        }
 
         ShareDetails shareDetailsResult = shareDetailsRepository.findByCharId(id);
         if (shareDetailsResult.getReport() == reportNum) {

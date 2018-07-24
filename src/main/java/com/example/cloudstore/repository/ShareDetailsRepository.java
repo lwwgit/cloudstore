@@ -10,6 +10,8 @@ import java.util.List;
 
 public interface ShareDetailsRepository extends JpaRepository<ShareDetails, Integer> {
 
+    List<ShareDetails> findAllByUsername(String username);
+
     ShareDetails findByCharId(String charId);
 
     List<ShareDetails> findAll();
