@@ -1,5 +1,6 @@
 package com.example.cloudstore.service;
 
+import com.example.cloudstore.domain.JsonSort;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 
@@ -15,6 +16,6 @@ public interface SortService {
                   String[] doc, String[] pict, String[] video,
                   String[] music, String[] other) throws IOException;
 
-    List<Map<String, Object>> SortCapacity() throws IOException, URISyntaxException;
+    JsonSort SortCapacity() throws IOException, URISyntaxException;
 
 }

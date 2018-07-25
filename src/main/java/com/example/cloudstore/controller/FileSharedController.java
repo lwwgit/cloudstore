@@ -31,6 +31,7 @@ public class FileSharedController {
     @PostMapping("/home/share/all")
     public Result AllShare() {
 
+        System.out.println("打印用户所有分享：" + fileSharedService.AllShare());
         return ResultUtil.success(fileSharedService.AllShare());
 
     }
