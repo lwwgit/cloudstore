@@ -33,14 +33,16 @@ public class DownloadController {
         String fileName = srcName.substring(srcName.lastIndexOf("/") + 1);
         System.out.println(fileName);
         String userFatherFileName = srcName.split("/")[1];
-        downloadHDFS(srcName,dataLocalName+userFatherFileName+fileName);
+        downloadHDFS(srcName,dataLocalName+userFatherFileName+"\\"+fileName);
 
         if (fileName != null) {
-            File file = new File(dataLocalName+userFatherFileName+fileName);
+            File file = new File(dataLocalName+userFatherFileName+"\\"+fileName);
+            System.out.println("file_name:"+ dataLocalName+userFatherFileName+"\\"+fileName);
             if (file.exists()) {
                 response.setContentType("application/force-download");// 设置强制下载不打开
-                String File_name = new String(fileName.getBytes(), "ISO-8859-1");
-                response.addHeader("Content-Disposition", "attachment;fileName=" + File_name);// 设置文件名
+                String File_name = new String(fileName .getBytes(), "ISO-8859-1");
+                System.out.println("下载名字："+File_name);
+                response.addHeader("Content-Disposition", "attachment;fileName=\"" + File_name+ "\"");// 设置文件名
                 byte[] buffer = new byte[1024 * 64];
                 FileInputStream fis = null;
                 BufferedInputStream bis = null;

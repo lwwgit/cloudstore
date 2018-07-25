@@ -27,7 +27,7 @@ public class GreetingController {
 	@SendTo("/topic/greetings")
 	public Greeting greeting(Message message) throws Exception {
 		Thread.sleep(1000); // simulated delay
-		return new Greeting("公告： " + HtmlUtils.htmlEscape(message.getNotice()));
+		return new Greeting(HtmlUtils.htmlEscape(message.getNotice()));
 	}
 	
 	@RequestMapping("/send")

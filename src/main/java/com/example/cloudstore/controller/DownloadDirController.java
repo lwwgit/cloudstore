@@ -39,7 +39,7 @@ public class DownloadDirController {
                 String FileName = fileName+".zip";
                 response.setCharacterEncoding("UTF-8");
                 response.setHeader("Content-Disposition",
-                        "attachment; filename=" + new String(FileName.getBytes(), "ISO-8859-1"));
+                        "attachment; filename=\"" + new String(FileName.getBytes(), "ISO-8859-1")+ "\"");
                 response.setContentLength((int) file.length());
                 response.setContentType("multipart/form-data");// 定义输出类型
                 FileInputStream fis = new FileInputStream(file);
@@ -104,7 +104,7 @@ public class DownloadDirController {
                 String FileName = fileName+".zip";
                 response.setCharacterEncoding("UTF-8");
                 response.setHeader("Content-Disposition",
-                        "attachment; filename=" + new String(FileName.getBytes("ISO8859-1"), "UTF-8"));
+                        "attachment; filename=\"" + new String(FileName.getBytes("ISO8859-1"), "UTF-8")+ "\"");
                 response.setContentType("multipart/form-data");// 定义输出类型
                 response.setContentLength((int) file.length());
                 FileInputStream fis = new FileInputStream(file);
